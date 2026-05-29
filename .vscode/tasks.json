@@ -69,17 +69,27 @@
       }
     },
     {
-      "label": "Run Application (Debug Mode)",
+      "label": "Boot Run (Debug JVM)",
       "type": "shell",
       "command": "./gradlew",
       "args": ["bootRun", "--debug-jvm"],
       "group": "none",
-      "problemMatcher": ["$gradle"],
       "isBackground": true,
       "presentation": {
         "reveal": "always",
         "panel": "dedicated"
-      }
+      },
+      "problemMatcher": [
+        {
+          "owner": "gradle-boot-debug",
+          "pattern": [{ "regexp": "^(.*)$", "kind": "file", "file": 1, "message": 1 }],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^.+$",
+            "endsPattern": "Listening for transport dt_socket at address"
+          }
+        }
+      ]
     },
     {
       "label": "Clean",

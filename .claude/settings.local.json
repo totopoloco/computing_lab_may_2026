@@ -17,7 +17,12 @@
       "Bash(/workspace/gradlew dependencies *)",
       "Bash(find /root /home -name \"spring-boot-graphql-test-*.jar\" 2>/dev/null | head -3)",
       "Read(//home/**)",
-      "Bash(jar tf *)"
+      "Bash(jar tf *)",
+      "Bash(./gradlew build *)",
+      "Bash(./gradlew bootRun)",
+      "Bash(echo \"PID: $!\")",
+      "Read(//tmp/**)",
+      "Bash(break)"
     ]
   }
 }

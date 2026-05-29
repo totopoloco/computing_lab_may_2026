@@ -43,7 +43,7 @@ public class ArithmeticController {
      * @return {@code a + b}
      */
     @QueryMapping
-    public BigDecimal add(@Argument final BigDecimal a, @Argument final BigDecimal b) {
+    public BigDecimal add(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
         return calculatorService.add(a, b);
     }
 
@@ -55,7 +55,7 @@ public class ArithmeticController {
      * @return {@code a - b}
      */
     @QueryMapping
-    public BigDecimal subtract(@Argument final BigDecimal a, @Argument final BigDecimal b) {
+    public BigDecimal subtract(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
         return calculatorService.subtract(a, b);
     }
 
@@ -67,7 +67,7 @@ public class ArithmeticController {
      * @return {@code a * b}
      */
     @QueryMapping
-    public BigDecimal multiply(@Argument final BigDecimal a, @Argument final BigDecimal b) {
+    public BigDecimal multiply(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
         return calculatorService.multiply(a, b);
     }
 
@@ -81,7 +81,7 @@ public class ArithmeticController {
      *             if {@code b} is zero
      */
     @QueryMapping
-    public BigDecimal divide(@Argument final BigDecimal a, @Argument final BigDecimal b) {
+    public BigDecimal divide(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
         return calculatorService.divide(a, b);
     }
 
