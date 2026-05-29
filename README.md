@@ -36,6 +36,7 @@ src/main/java/at/mavila/computing_lab_may_2026/
 
 1. [Calculator](#1-calculator)
 2. [GraphQL API](#2-graphql-api)
+3. [Testing Quality](#3-testing-quality)
 
 ---
 
@@ -77,6 +78,8 @@ All operations delegate directly to `BigDecimal` methods. Division includes a ze
   OUTPUT: BigDecimal result
 ────────────────────────────────────────────────────
 ```
+
+Null inputs are rejected at the boundary by Jakarta `@NotNull` + `@Validated` before the method body runs, so no manual null guard is needed inside `divide`.
 
 ### Why BigDecimal?
 
@@ -124,29 +127,9 @@ The only API is GraphQL. There are no REST controllers.
 
 ```graphql
 type Query {
-    """
-    Adds two numbers and returns the result.
-    Supports arbitrary-precision arithmetic via BigDecimal.
-    """
     add(a: BigDecimal!, b: BigDecimal!): BigDecimal!
-
-    """
-    Subtracts b from a and returns the result.
-    Supports arbitrary-precision arithmetic via BigDecimal.
-    """
     subtract(a: BigDecimal!, b: BigDecimal!): BigDecimal!
-
-    """
-    Multiplies two numbers and returns the result.
-    Supports arbitrary-precision arithmetic via BigDecimal.
-    """
     multiply(a: BigDecimal!, b: BigDecimal!): BigDecimal!
-
-    """
-    Divides a by b and returns the result rounded to 10 decimal places (HALF_UP).
-    Throws an error if b is zero.
-    Supports arbitrary-precision arithmetic via BigDecimal.
-    """
     divide(a: BigDecimal!, b: BigDecimal!): BigDecimal!
 }
 
@@ -166,47 +149,7 @@ query {
 **Response:**
 
 ```json
-{
-    "data": {
-        "add": 4.0
-    }
-}
-```
-
-#### Subtraction
-
-```graphql
-query {
-    subtract(a: 10, b: 3.7)
-}
-```
-
-**Response:**
-
-```json
-{
-    "data": {
-        "subtract": 6.3
-    }
-}
-```
-
-#### Multiplication
-
-```graphql
-query {
-    multiply(a: 3.14, b: 2)
-}
-```
-
-**Response:**
-
-```json
-{
-    "data": {
-        "multiply": 6.28
-    }
-}
+{ "data": { "add": 4.0 } }
 ```
 
 #### Division
@@ -220,16 +163,10 @@ query {
 **Response:**
 
 ```json
-{
-    "data": {
-        "divide": 3.3333333333
-    }
-}
+{ "data": { "divide": 3.3333333333 } }
 ```
 
 ### Error Handling
-
-The GraphQL API returns structured errors for domain exceptions.
 
 #### Division by Zero
 
@@ -243,19 +180,14 @@ query {
 
 ```json
 {
-    "errors": [
-        {
-            "message": "Division by zero is not allowed",
-            "extensions": {
-                "errorCode": "DIVISION_BY_ZERO",
-                "classification": "BAD_REQUEST"
-            }
-        }
-    ]
+    "errors": [{
+        "message": "Division by zero is not allowed",
+        "extensions": { "errorCode": "DIVISION_BY_ZERO", "classification": "BAD_REQUEST" }
+    }]
 }
 ```
 
-#### Invalid Argument
+#### Null Argument
 
 ```graphql
 query {
@@ -267,16 +199,10 @@ query {
 
 ```json
 {
-    "errors": [
-        {
-            "message": "Invalid input: argument must not be null",
-            "extensions": {
-                "errorCode": "INVALID_ARGUMENT",
-                "reason": "argument must not be null",
-                "classification": "BAD_REQUEST"
-            }
-        }
-    ]
+    "errors": [{
+        "message": "Invalid input: argument must not be null",
+        "extensions": { "errorCode": "INVALID_ARGUMENT", "classification": "BAD_REQUEST" }
+    }]
 }
 ```
 
@@ -290,6 +216,82 @@ curl -X POST http://localhost:8080/graphql \
 
 ---
 
+## 3. Testing Quality
+
+This project uses two complementary tools to measure test quality. They answer different questions and must be read together.
+
+| Tool       | Question answered                              | Report location                             |
+| ---------- | ---------------------------------------------- | ------------------------------------------- |
+| **JaCoCo** | Were these lines/branches *executed* by tests? | `build/reports/jacoco/test/html/index.html` |
+| **Pitest** | Did the tests *detect a behavioral change*?    | `build/reports/pitest/index.html`           |
+
+A test suite can achieve 100% JaCoCo line coverage while still letting many Pitest mutants survive — if the tests call the code but never assert meaningfully on its output.
+
+### JaCoCo (line and branch coverage)
+
+JaCoCo runs automatically after every `./gradlew test`. No extra command is needed.
+
+```bash
+./gradlew test    # runs tests → JaCoCo report generated automatically
+```
+
+The report is scoped to `domain.*` and `application.*` packages.
+
+### Pitest (mutation testing)
+
+```bash
+./gradlew pitest  # report: build/reports/pitest/index.html
+```
+
+Pitest injects small code changes (mutants) one at a time and checks whether at least one test fails. A surviving mutant means no test currently detects that change. The build threshold is ≥ 79% for both mutation and line coverage.
+
+The target test class and thresholds are configurable from the command line without editing `build.gradle`:
+
+```bash
+# Run against the strong test suite (default)
+./gradlew pitest \
+  -PpitestTargetTests=at.mavila.computing_lab_may_2026.domain.arithmetic.CalculatorTest
+
+# Run against the weak test suite (thresholds lowered so the build completes)
+./gradlew pitest \
+  -PpitestTargetTests=at.mavila.computing_lab_may_2026.domain.arithmetic.CalculatorWeakTest \
+  -PpitestMutationThreshold=0 -PpitestCoverageThreshold=0
+```
+
+### CalculatorWeakTest — demonstrating surviving mutants
+
+`CalculatorWeakTest` is a deliberately weak companion to `CalculatorTest`. Its tests call every `Calculator` method but make no meaningful assertions — no return-value checks, only loose exception-type checks. This causes two classes of Pitest mutants to survive undetected:
+
+| Mutant | Where | Why it survives |
+| ------ | ----- | --------------- |
+| `NULL_RETURNS` | `add`, `subtract`, `multiply`, `divide` | Tests discard the return value or only call `doesNotThrowAnyException()` — returning `null` is invisible |
+| `NEGATE_CONDITIONALS` | `divide` zero-guard | Test checks `isInstanceOf(RuntimeException.class)`; the negated guard causes a plain `ArithmeticException` instead of `DivisionByZeroException`, and both satisfy the broad check |
+
+### compare-pitest.sh — side-by-side comparison
+
+```bash
+./compare-pitest.sh
+```
+
+Runs pitest and JaCoCo twice — once scoped to `CalculatorTest`, once to `CalculatorWeakTest` — then prints a combined table:
+
+```
+╔════════════════════════════════════════════════════════════════════╗
+║         JaCoCo Line Coverage  vs  Pitest Mutation Score           ║
+╠════════════════════════════════════════════════════════════════════╣
+║  Test suite                     JaCoCo lines    Pitest mutants   ║
+╠════════════════════════════════════════════════════════════════════╣
+║  CalculatorTest      (strong)           69%              100%    ║
+║  CalculatorWeakTest  (weak)             69%               16%    ║
+╚════════════════════════════════════════════════════════════════════╝
+```
+
+Both suites produce the same JaCoCo score because both call every Calculator method. The mutation score collapses from 100% to 16% because weak assertions cannot distinguish correct code from mutated code.
+
+Reports for each run are preserved under `build/reports/pitest-strong/` and `build/reports/pitest-weak/`, each containing both a pitest report (`index.html`) and a JaCoCo report (`jacoco/index.html`).
+
+---
+
 ## Running the Project
 
 ### Prerequisites
@@ -300,11 +302,12 @@ curl -X POST http://localhost:8080/graphql \
 ### Commands
 
 ```bash
-./gradlew build            # compile + test
+./gradlew build            # compile + test + JaCoCo report
 ./gradlew build -x test    # compile only
-./gradlew test             # run all tests
+./gradlew test             # run all tests + generate JaCoCo report automatically
 ./gradlew bootRun          # start application (port 8080)
 ./gradlew pitest           # mutation testing (report: build/reports/pitest/index.html)
+./compare-pitest.sh        # side-by-side JaCoCo vs pitest for strong and weak test suites
 ```
 
 Run a single test class:
@@ -317,8 +320,9 @@ Run a single test class:
 
 - Active profile: `dev` (H2 in-memory DB, GraphiQL enabled)
 - Java 25 toolchain, Spring Boot 4.x
-- Pitest mutation threshold: ≥ 79% (both mutation and line coverage)
-- Pitest targets only `domain.*` and `application.*` packages
+- Pitest mutation threshold: ≥ 79%; overridable via `-PpitestMutationThreshold` and `-PpitestCoverageThreshold`
+- Pitest target tests: defaults to `domain.*`; overridable via `-PpitestTargetTests`
+- JaCoCo report scoped to `domain.*` and `application.*`; generated automatically after `./gradlew test`
 
 ---
 
