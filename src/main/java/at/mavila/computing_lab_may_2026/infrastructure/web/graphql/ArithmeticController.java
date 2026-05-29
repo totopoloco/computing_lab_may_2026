@@ -6,11 +6,11 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
-import at.mavila.computing_lab_may_2026.application.CalculatorService;
+import at.mavila.computing_lab_may_2026.application.arithmetic.CalculatorService;
 import lombok.RequiredArgsConstructor;
 
 /**
- * GraphQL controller that exposes calculator operations as queries.
+ * GraphQL controller that exposes arithmetic operations as queries.
  *
  * <p>
  * Translates GraphQL arguments into application service calls. Contains no business logic —
@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Controller
 @RequiredArgsConstructor
-public class CalculatorController {
+public class ArithmeticController {
 
     private final CalculatorService calculatorService;
 

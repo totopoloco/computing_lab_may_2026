@@ -1,4 +1,4 @@
-package at.mavila.computing_lab_may_2026.application;
+package at.mavila.computing_lab_may_2026.application.arithmetic;
 
 import java.math.BigDecimal;
 

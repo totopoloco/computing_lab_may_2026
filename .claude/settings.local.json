@@ -6,7 +6,18 @@
       "Bash(git push *)",
       "Bash(git remote *)",
       "Bash(git pull *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(./gradlew test *)",
+      "Bash(bash gradlew test)",
+      "Bash(chmod +x /workspace/gradlew)",
+      "Bash(/workspace/gradlew test *)",
+      "Bash(find /root/.gradle -name \"spring-boot-test-autoconfigure-*.jar\" 2>/dev/null | head -5)",
+      "Read(//root/**)",
+      "Bash(xargs -I{} jar tf {})",
+      "Bash(/workspace/gradlew dependencies *)",
+      "Bash(find /root /home -name \"spring-boot-graphql-test-*.jar\" 2>/dev/null | head -3)",
+      "Read(//home/**)",
+      "Bash(jar tf *)"
     ]
   }
 }
