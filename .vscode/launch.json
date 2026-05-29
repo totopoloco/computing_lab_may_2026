@@ -6,9 +6,9 @@
       "name": "Spring Boot - Debug",
       "request": "launch",
       "mainClass": "at.mavila.computing_lab_may_2026.ComputingLabMay2026Application",
-      "projectName": "computing_lab_may_2026",
       "vmArgs": ["-Dspring.profiles.active=dev", "-Xmx512m"],
       "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
       "preLaunchTask": "Build Project"
     },
     {
@@ -17,7 +17,6 @@
       "request": "attach",
       "hostName": "localhost",
       "port": 5005,
-      "projectName": "computing_lab_may_2026",
       "preLaunchTask": "Boot Run (Debug JVM)"
     }
   ],

@@ -22,7 +22,13 @@
       "Bash(./gradlew bootRun)",
       "Bash(echo \"PID: $!\")",
       "Read(//tmp/**)",
-      "Bash(break)"
+      "Bash(break)",
+      "Bash(./gradlew pitest *)",
+      "Bash(./gradlew help *)",
+      "Bash(./compare-pitest.sh)",
+      "Bash(sed -i '/# cleanTest forces re-execution without wiping compiled classes\\\\./d' /workspace/compare-pitest.sh)",
+      "Bash(sed -i '/# The wildcard picks up @Nested inner classes registered under the outer name\\\\./d' /workspace/compare-pitest.sh)",
+      "Bash(./gradlew cleanTest test)"
     ]
   }
 }

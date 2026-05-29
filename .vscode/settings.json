@@ -6,7 +6,7 @@
   "editor.gotoLocation.multipleReferences": "goto",
   "editor.gotoLocation.multipleTypeDefinitions": "goto",
   // Java Settings
-  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.configuration.updateBuildConfiguration": "automatic",
   "java.compile.nullAnalysis.mode": "disabled",
   "java.autobuild.enabled": true,
   "java.project.outputPath": "build/classes/java/main",
@@ -18,7 +18,7 @@
     "test-lib/**/*.jar"
   ],
   "java.import.gradle.arguments": "--no-watch-fs",
-  "java.gradle.buildServer.enabled": "off",
+  "java.gradle.buildServer.enabled": "on",
   "java.maxConcurrentBuilds": 1,
   "java.diagnostic.filter": [],
   "java.references.includeDecompiledSources": false,
@@ -27,7 +27,7 @@
   // Java Debug Settings - Disable Hot Code Replace
   "java.debug.settings.hotCodeReplace": "never",
   "java.debug.settings.enableRunDebugCodeLens": false,
-  "java.debug.settings.forceBuildBeforeLaunch": false,
+  "java.debug.settings.forceBuildBeforeLaunch": true,
   "java.configuration.runtimes": [
     {
       "name": "JavaSE-25",

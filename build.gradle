@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
     id 'org.springframework.boot' version '4.0.6'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'info.solidsoft.pitest' version '1.19.0'
@@ -48,43 +49,67 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-graphql-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //pitest 'com.arcmutate:arcmutate-spring:1.1.3'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+// ==================== JaCoCo Line/Branch Coverage ====================
+// Runs automatically after every `./gradlew test`
+// Report: build/reports/jacoco/test/html/index.html
+//
+// JaCoCo measures which lines were *executed*.  Compare its near-100% result
+// against the pitest score to see why line coverage alone is not enough.
+
+jacoco {
+    toolVersion = '0.8.13'
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required  = true
+        html.required = true
+        csv.required  = false
+    }
+    // Scope to the same packages pitest targets
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, include: [
+                'at/mavila/computing_lab_may_2026/domain/**',
+                'at/mavila/computing_lab_may_2026/application/**'
+            ])
+        }))
+    }
 }
 
 // ==================== Pitest Mutation Testing ====================
 // Run with: ./gradlew pitest
 // Report: build/reports/pitest/index.html
+//
+// Override defaults from the command line (used by compare-pitest.sh):
+//   -PpitestTargetTests=<fully-qualified-class>
+//   -PpitestMutationThreshold=<0-100>
+//   -PpitestCoverageThreshold=<0-100>
 
 pitest {
-    // Target classes to mutate (domain + application business logic)
-    targetClasses = ['at.mavila.computing_lab_may_2026.domain.*', 'at.mavila.computing_lab_may_2026.application.*']
-    // Target tests to run
-    targetTests = ['at.mavila.computing_lab_may_2026.domain.*', 'at.mavila.computing_lab_may_2026.application.*']
-    // JUnit 5 support
-    junit5PluginVersion = '1.2.1'
-    // Pitest version - 1.22.1+ supports Java 25 (ASM 9.9 bump)
-    pitestVersion = '1.25.1'
-    // Mutation operators
-    mutators = ['DEFAULTS']
-    // Output formats
-    outputFormats = ['HTML', 'XML']
-    // Threads for parallel execution (2 to avoid OOM with Spring Boot context per mutant)
-    threads = 2
-    // Timeout for mutations
+    targetClasses     = ['at.mavila.computing_lab_may_2026.domain.*']
+    targetTests       = [findProperty('pitestTargetTests')
+                             ?: 'at.mavila.computing_lab_may_2026.domain.*']
+    mutationThreshold = (findProperty('pitestMutationThreshold') ?: '79').toInteger()
+    coverageThreshold = (findProperty('pitestCoverageThreshold') ?: '79').toInteger()
+    junit5PluginVersion  = '1.2.1'
+    pitestVersion        = '1.25.1'
+    mutators             = ['DEFAULTS']
+    outputFormats        = ['HTML', 'XML']
+    threads              = 2
     timeoutConstInMillis = 60000
-    // Fail build if mutation coverage is below threshold
-    mutationThreshold = 79
-    // Coverage threshold
-    coverageThreshold = 79
-    // Verbose output
-    verbose = true
-    // Timestamp in report directory
-    timestampedReports = false
-    // JVM args for forked process - 2GB per minion; Spring Boot context startup needs headroom
-    jvmArgs = ['-Xmx2048m']
+    verbose              = true
+    timestampedReports   = false
+    jvmArgs              = ['-Xmx2048m']
 }
 
 // Uncomment to run Pitest as part of the default build:

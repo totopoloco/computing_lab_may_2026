@@ -2,7 +2,6 @@ package at.mavila.computing_lab_may_2026.domain.arithmetic;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Objects;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -84,7 +83,7 @@ public class Calculator {
      * @throws DivisionByZeroException if {@code b} is zero
      */
     public BigDecimal divide(@NotNull final BigDecimal a, @NotNull final BigDecimal b) {
-        if (Objects.isNull(b) || b.compareTo(BigDecimal.ZERO) == 0) {
+        if (b.compareTo(BigDecimal.ZERO) == 0) {
             throw new DivisionByZeroException();
         }
         return a.divide(b, DIVISION_SCALE, RoundingMode.HALF_UP);
