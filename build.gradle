@@ -1,0 +1,91 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.6'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'info.solidsoft.pitest' version '1.19.0'
+}
+
+group = 'at.mavila'
+version = '0.0.1-SNAPSHOT'
+description = 'computing_lab_may_2026'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+// Add -parameters flag to preserve method parameter names for Spring GraphQL
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add('-parameters')
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-h2console'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-graphql'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.graphql-java:graphql-java-extended-scalars:22.0'
+    // Source: https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation("org.apache.commons:commons-lang3:3.20.0")
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-graphql-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// ==================== Pitest Mutation Testing ====================
+// Run with: ./gradlew pitest
+// Report: build/reports/pitest/index.html
+
+pitest {
+    // Target classes to mutate (domain + application business logic)
+    targetClasses = ['at.mavila.computing_lab_may_2026.domain.*', 'at.mavila.computing_lab_may_2026.application.*']
+    // Target tests to run
+    targetTests = ['at.mavila.computing_lab_may_2026.domain.*', 'at.mavila.computing_lab_may_2026.application.*']
+    // JUnit 5 support
+    junit5PluginVersion = '1.2.1'
+    // Pitest version - 1.22.1+ supports Java 25 (ASM 9.9 bump)
+    pitestVersion = '1.25.1'
+    // Mutation operators
+    mutators = ['DEFAULTS']
+    // Output formats
+    outputFormats = ['HTML', 'XML']
+    // Threads for parallel execution (2 to avoid OOM with Spring Boot context per mutant)
+    threads = 2
+    // Timeout for mutations
+    timeoutConstInMillis = 60000
+    // Fail build if mutation coverage is below threshold
+    mutationThreshold = 79
+    // Coverage threshold
+    coverageThreshold = 79
+    // Verbose output
+    verbose = true
+    // Timestamp in report directory
+    timestampedReports = false
+    // JVM args for forked process - 2GB per minion; Spring Boot context startup needs headroom
+    jvmArgs = ['-Xmx2048m']
+}
+
+// Uncomment to run Pitest as part of the default build:
+// build.dependsOn 'pitest'

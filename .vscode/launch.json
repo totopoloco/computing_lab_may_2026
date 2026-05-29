@@ -1,0 +1,49 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot - Run",
+      "request": "launch",
+      "mainClass": "at.mavila.computing_lab_may_2026.ComputingLabMay2026Application",
+      "projectName": "computing_lab_may_2026",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": ["-Dspring.profiles.active=dev", "-Xmx1024m"],
+      "java.debug.settings.hotCodeReplace": "never"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot - Debug",
+      "request": "launch",
+      "mainClass": "at.mavila.computing_lab_may_2026.ComputingLabMay2026Application",
+      "projectName": "computing_lab_may_2026",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": [
+        "-Dspring.profiles.active=dev",
+        "-Xmx1024m",
+        "-Dspring.jpa.show-sql=true"
+      ],
+      "console": "integratedTerminal",
+      "java.debug.settings.hotCodeReplace": "never"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot - Remote Debug",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005,
+      "projectName": "computing_lab_may_2026",
+      "java.debug.settings.hotCodeReplace": "never"
+    },
+    {
+      "type": "java",
+      "name": "Current File",
+      "request": "launch",
+      "mainClass": "${file}",
+      "java.debug.settings.hotCodeReplace": "never"
+    }
+  ],
+  "compounds": []
+}

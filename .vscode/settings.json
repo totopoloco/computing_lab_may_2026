@@ -1,0 +1,156 @@
+{
+  // Editor Go-to-Definition Settings
+  "editor.gotoLocation.multipleDefinitions": "goto",
+  "editor.gotoLocation.multipleDeclarations": "goto",
+  "editor.gotoLocation.multipleImplementations": "goto",
+  "editor.gotoLocation.multipleReferences": "goto",
+  "editor.gotoLocation.multipleTypeDefinitions": "goto",
+  // Java Settings
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.compile.nullAnalysis.mode": "disabled",
+  "java.autobuild.enabled": true,
+  "java.project.outputPath": "build/classes/java/main",
+  "java.jdt.ls.java.home": "/opt/java/openjdk",
+  "java.import.gradle.enabled": true,
+  "java.import.gradle.wrapper.enabled": true,
+  "java.import.gradle.offline.enabled": false,
+  "java.project.referencedLibraries": [
+    "test-lib/**/*.jar"
+  ],
+  "java.import.gradle.arguments": "--no-watch-fs",
+  "java.gradle.buildServer.enabled": "off",
+  "java.maxConcurrentBuilds": 1,
+  "java.diagnostic.filter": [],
+  "java.references.includeDecompiledSources": false,
+  "java.eclipse.downloadSources": true,
+  "java.settings.url": ".settings/org.eclipse.jdt.core.prefs",
+  // Java Debug Settings - Disable Hot Code Replace
+  "java.debug.settings.hotCodeReplace": "never",
+  "java.debug.settings.enableRunDebugCodeLens": false,
+  "java.debug.settings.forceBuildBeforeLaunch": false,
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-25",
+      "path": "/opt/java/openjdk",
+      "default": true,
+      "sources": "/opt/java/openjdk/lib/src.zip"
+    }
+  ],
+  // Spring Boot Settings
+  "spring-boot.ls.java.home": "/opt/java/openjdk",
+  "boot-java.rewrite.reconcile": false,
+  "spring-boot.ls.problem.boot2.JAVA_AUTOWIRED_CONSTRUCTOR": "IGNORE",
+  "spring-boot.ls.checkJVM": false,
+  // Editor Settings
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "editor.rulers": [
+    120
+  ],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.wordWrap": "off",
+  "editor.minimap.enabled": true,
+  "editor.suggestSelection": "first",
+  // Files Settings
+  "files.autoSave": "onFocusChange",
+  "java.excludedPackages": [
+    "org.antlr.v4.runtime.misc"
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.gradle": true,
+    "**/build": true,
+    "**/.idea": true,
+    "**/*.class": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/build/**": true,
+    "**/.gradle/**": true,
+    "**/bin/**": true,
+    "**/out/**": true,
+    "**/.settings/**": true
+  },
+  // Search Settings
+  "search.exclude": {
+    "**/build": true,
+    "**/.gradle": true,
+    "**/node_modules": true
+  },
+  // Terminal Settings
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.fontFamily": "DejaVu Sans Mono, monospace",
+  "terminal.integrated.fontSize": 15,
+  "terminal.integrated.lineHeight": 1.4,
+  "terminal.integrated.letterSpacing": 0.5,
+  "terminal.integrated.fontWeight": "normal",
+  "terminal.integrated.fontWeightBold": "bold",
+  // Gradle Settings
+  "gradle.javaDebug.cleanOutput": false,
+  "gradle.autoDetect": "on",
+  "gradle.nestedProjects": false,
+  "gradle.reuseTerminals": "all",
+  // Git Settings
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  // Testing Settings
+  "java.test.defaultConfig": "standard",
+  "java.test.config": {
+    "name": "standard",
+    "workingDirectory": "${workspaceFolder}",
+    "vmArgs": [
+      "-Xmx512m"
+    ]
+  },
+  "java.test.report.showAfterExecution": "onFailure",
+  "testExplorer.useNativeTesting": true,
+  // Code Runner Settings
+  "code-runner.executorMap": {
+    "java": "cd $dir && javac $fileName && java $fileNameWithoutExt"
+  },
+  "code-runner.runInTerminal": true,
+  // Language-specific settings
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java",
+    "editor.tabSize": 2
+  },
+  "[gradle]": {
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[yaml]": {
+    "editor.tabSize": 2
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on"
+  },
+  // Sound Settings - Disable all sounds
+  "accessibility.signalOptions.volume": 0,
+  "java.completion.favoriteStaticMembers": [
+    "org.assertj.core.api.Assertions.*",
+    "org.junit.Assert.*",
+    "org.junit.Assume.*",
+    "org.junit.jupiter.api.Assertions.*",
+    "org.junit.jupiter.api.Assumptions.*",
+    "org.junit.jupiter.api.DynamicContainer.*",
+    "org.junit.jupiter.api.DynamicTest.*",
+    "org.mockito.Mockito.*",
+    "org.mockito.ArgumentMatchers.*",
+    "org.mockito.Answers.*"
+  ],
+  "java.dependency.packagePresentation": "hierarchical",
+  "codescene.enableTelemetry": false,
+  "editor.inlineSuggest.enabled": true,
+  "chat.disableAIFeatures": true
+}
