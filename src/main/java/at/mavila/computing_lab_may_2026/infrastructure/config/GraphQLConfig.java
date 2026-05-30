@@ -24,15 +24,15 @@ import graphql.scalars.ExtendedScalars;
 @Configuration
 public class GraphQLConfig {
 
-    /**
-     * Configures custom scalars for GraphQL.
-     *
-     * @return the runtime wiring configurer with custom scalars
-     */
-    @Bean
-    public RuntimeWiringConfigurer runtimeWiringConfigurer() {
-        return wiringBuilder -> wiringBuilder
-                .scalar(ExtendedScalars.GraphQLBigDecimal);
-    }
+  /**
+   * Configures custom scalars for GraphQL.
+   *
+   * @return the runtime wiring configurer with custom scalars
+   */
+  @Bean
+  RuntimeWiringConfigurer runtimeWiringConfigurer() {
+    return wiringBuilder -> wiringBuilder
+        .scalar(ExtendedScalars.GraphQLBigDecimal);
+  }
 
 }

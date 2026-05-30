@@ -8,11 +8,11 @@ package at.mavila.computing_lab_may_2026.domain.arithmetic.exception;
  */
 public class DivisionByZeroException extends RuntimeException {
 
-    /**
-     * Constructs a new {@code DivisionByZeroException} with a default message.
-     */
-    public DivisionByZeroException() {
-        super("Division by zero is not allowed");
-    }
+  /**
+   * Constructs a new {@code DivisionByZeroException} with a default message.
+   */
+  public DivisionByZeroException() {
+    super("Division by zero is not allowed");
+  }
 
 }

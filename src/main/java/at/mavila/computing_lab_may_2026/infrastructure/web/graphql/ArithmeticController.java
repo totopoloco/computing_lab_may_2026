@@ -33,56 +33,56 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ArithmeticController {
 
-    private final CalculatorService calculatorService;
+  private final CalculatorService calculatorService;
 
-    /**
-     * Resolves the {@code add} GraphQL query.
-     *
-     * @param a the first operand
-     * @param b the second operand
-     * @return {@code a + b}
-     */
-    @QueryMapping
-    public BigDecimal add(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
-        return calculatorService.add(a, b);
-    }
+  /**
+   * Resolves the {@code add} GraphQL query.
+   *
+   * @param a the first operand
+   * @param b the second operand
+   * @return {@code a + b}
+   */
+  @QueryMapping
+  public BigDecimal add(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
+    return calculatorService.add(a, b);
+  }
 
-    /**
-     * Resolves the {@code subtract} GraphQL query.
-     *
-     * @param a the minuend
-     * @param b the subtrahend
-     * @return {@code a - b}
-     */
-    @QueryMapping
-    public BigDecimal subtract(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
-        return calculatorService.subtract(a, b);
-    }
+  /**
+   * Resolves the {@code subtract} GraphQL query.
+   *
+   * @param a the minuend
+   * @param b the subtrahend
+   * @return {@code a - b}
+   */
+  @QueryMapping
+  public BigDecimal subtract(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
+    return calculatorService.subtract(a, b);
+  }
 
-    /**
-     * Resolves the {@code multiply} GraphQL query.
-     *
-     * @param a the first factor
-     * @param b the second factor
-     * @return {@code a * b}
-     */
-    @QueryMapping
-    public BigDecimal multiply(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
-        return calculatorService.multiply(a, b);
-    }
+  /**
+   * Resolves the {@code multiply} GraphQL query.
+   *
+   * @param a the first factor
+   * @param b the second factor
+   * @return {@code a * b}
+   */
+  @QueryMapping
+  public BigDecimal multiply(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
+    return calculatorService.multiply(a, b);
+  }
 
-    /**
-     * Resolves the {@code divide} GraphQL query.
-     *
-     * @param a the dividend
-     * @param b the divisor; must not be zero
-     * @return {@code a / b} rounded to 10 decimal places
-     * @throws at.mavila.computing_lab_may_2026.domain.arithmetic.exception.DivisionByZeroException
-     *             if {@code b} is zero
-     */
-    @QueryMapping
-    public BigDecimal divide(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
-        return calculatorService.divide(a, b);
-    }
+  /**
+   * Resolves the {@code divide} GraphQL query.
+   *
+   * @param a the dividend
+   * @param b the divisor; must not be zero
+   * @return {@code a / b} rounded to 10 decimal places
+   * @throws at.mavila.computing_lab_may_2026.domain.arithmetic.exception.DivisionByZeroException
+   *             if {@code b} is zero
+   */
+  @QueryMapping
+  public BigDecimal divide(@Argument("a") final BigDecimal a, @Argument("b") final BigDecimal b) {
+    return calculatorService.divide(a, b);
+  }
 
 }

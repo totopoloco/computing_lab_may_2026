@@ -152,5 +152,5 @@
   "java.dependency.packagePresentation": "hierarchical",
   "codescene.enableTelemetry": false,
   "editor.inlineSuggest.enabled": true,
-  "chat.disableAIFeatures": true
+  "chat.disableAIFeatures": false
 }

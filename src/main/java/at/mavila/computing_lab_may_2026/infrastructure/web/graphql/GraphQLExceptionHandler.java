@@ -34,46 +34,46 @@ import graphql.schema.DataFetchingEnvironment;
 @Component
 public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter {
 
-    /**
-     * Resolves an exception to a single GraphQL error.
-     *
-     * @param ex  the exception that was thrown
-     * @param env the data fetching environment containing query context
-     * @return a {@link GraphQLError} for handled exceptions, or {@code null} to delegate
-     *         to the default resolver
-     */
-    @Override
-    protected GraphQLError resolveToSingleError(final Throwable ex, final DataFetchingEnvironment env) {
-        if (ex instanceof DivisionByZeroException divisionByZeroEx) {
-            return buildBadRequestError(env, divisionByZeroEx.getMessage(),
-                    Map.of("errorCode", "DIVISION_BY_ZERO"));
-        }
-
-        if (ex instanceof IllegalArgumentException illegalArgEx) {
-            return buildBadRequestError(env, "Invalid input: %s".formatted(illegalArgEx.getMessage()),
-                    Map.of(
-                            "errorCode", "INVALID_ARGUMENT",
-                            "reason", illegalArgEx.getMessage()));
-        }
-
-        return null;
+  /**
+   * Resolves an exception to a single GraphQL error.
+   *
+   * @param ex  the exception that was thrown
+   * @param env the data fetching environment containing query context
+   * @return a {@link GraphQLError} for handled exceptions, or {@code null} to delegate
+   *         to the default resolver
+   */
+  @Override
+  protected GraphQLError resolveToSingleError(final Throwable ex, final DataFetchingEnvironment env) {
+    if (ex instanceof DivisionByZeroException divisionByZeroEx) {
+      return buildBadRequestError(env, divisionByZeroEx.getMessage(),
+          Map.of("errorCode", "DIVISION_BY_ZERO"));
     }
 
-    /**
-     * Builds a GraphQL error with BAD_REQUEST type and the given extensions.
-     *
-     * @param env        the data fetching environment
-     * @param message    the error message
-     * @param extensions the extension fields to include in the error
-     * @return the constructed GraphQL error
-     */
-    private GraphQLError buildBadRequestError(final DataFetchingEnvironment env, final String message,
-            final Map<String, Object> extensions) {
-        return GraphqlErrorBuilder.newError(env)
-                .message(message)
-                .errorType(ErrorType.BAD_REQUEST)
-                .extensions(extensions)
-                .build();
+    if (ex instanceof IllegalArgumentException illegalArgEx) {
+      return buildBadRequestError(env, "Invalid input: %s".formatted(illegalArgEx.getMessage()),
+          Map.of(
+              "errorCode", "INVALID_ARGUMENT",
+              "reason", illegalArgEx.getMessage()));
     }
+
+    return null;
+  }
+
+  /**
+   * Builds a GraphQL error with BAD_REQUEST type and the given extensions.
+   *
+   * @param env        the data fetching environment
+   * @param message    the error message
+   * @param extensions the extension fields to include in the error
+   * @return the constructed GraphQL error
+   */
+  private GraphQLError buildBadRequestError(final DataFetchingEnvironment env, final String message,
+      final Map<String, Object> extensions) {
+    return GraphqlErrorBuilder.newError(env)
+        .message(message)
+        .errorType(ErrorType.BAD_REQUEST)
+        .extensions(extensions)
+        .build();
+  }
 
 }

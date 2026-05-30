@@ -37,7 +37,9 @@
         "yashar-zolmajdi.graphql-complexity-vscode",
         "codescene.codescene-vscode",
         "sonarsource.sonarlint-vscode",
-        "anthropic.claude-code"
+        "anthropic.claude-code",
+        "GitHub.copilot",
+        "GitHub.copilot-chat"
       ],
       // VS Code settings
       "settings": {
