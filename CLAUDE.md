@@ -59,7 +59,7 @@ When adding a new feature the full touch list is:
 
 - Public methods ≤ 3 parameters; group extras into a `record` parameter object.
 - Cyclomatic complexity ≤ 10 per method; extract private helpers.
-- Guard-clause pattern: check the **positive** (happy-path) condition and return early, then handle the exceptional path below — not the other way around.
+- Guard-clause pattern: check the **exceptional/error** condition at the top and return/throw early; let the happy path flow naturally below.
 - Domain services must delegate sub-concerns to injected `@Component` collaborators. No monolithic methods.
 
 **String formatting** — `String.format(...)` or `"...".formatted(...)` for messages with dynamic values. No string concatenation (`+`) for error messages.
@@ -71,7 +71,7 @@ When adding a new feature the full touch list is:
 ## Testing conventions
 
 - Domain tests: `@SpringBootTest` (full context, no mocks), AssertJ assertions, exhaustive coverage of happy paths, edge cases, and constraint violations.
-- Application tests: `@Nested` inner classes using JUnit 5 assertions.
+- Application tests: `@Nested` inner classes using AssertJ assertions (same as domain tests).
 - GraphQL integration tests: `GraphQlTester` with raw GraphQL query documents, covering happy-path and error responses.
 - Mutation testing: every new domain class must maintain the project-wide ≥ 79% mutation and line coverage threshold (`./gradlew pitest`). Tests must kill mutations — avoid trivial assertions that survive mutants.
 - `CalculatorWeakTest` is an intentional educational artifact that demonstrates how imprecise assertions allow mutation survivors (e.g., `NULL_RETURNS`, `NEGATE_CONDITIONALS`). Do not strengthen it.
@@ -80,5 +80,16 @@ When adding a new feature the full touch list is:
 
 - Active profile: `dev` (H2 in-memory DB, GraphiQL enabled, `logging.pattern.console=%msg%n` for clean output)
 - Java 25 toolchain, Spring Boot 4.x
-- Pitest mutation threshold: 79% (both mutation and line coverage)
-- Pitest targets only `domain.*` and `application.*` packages
+- Pitest mutation threshold: 79%; targets `domain.*` classes only
+- JaCoCo line/branch coverage runs automatically after `./gradlew test`; report: `build/reports/jacoco/test/html/index.html`; scoped to `domain.*` + `application.*`
+
+Pitest CLI overrides (used by `compare-pitest.sh` and useful for iterating on a single domain class):
+
+```bash
+./gradlew pitest \
+  -PpitestTargetTests=at.mavila.computing_lab_may_2026.domain.arithmetic.CalculatorTest \
+  -PpitestMutationThreshold=79 \
+  -PpitestCoverageThreshold=79
+```
+
+`./compare-pitest.sh` runs pitest + JaCoCo twice — once with `CalculatorTest`, once with `CalculatorWeakTest` — and prints a side-by-side table showing mutation score collapse with weak assertions. Reinforces why `CalculatorWeakTest` must not be strengthened.
