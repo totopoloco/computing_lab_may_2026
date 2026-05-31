@@ -93,3 +93,7 @@ Pitest CLI overrides (used by `compare-pitest.sh` and useful for iterating on a 
 ```
 
 `./compare-pitest.sh` runs pitest + JaCoCo twice — once with `CalculatorTest`, once with `CalculatorWeakTest` — and prints a side-by-side table showing mutation score collapse with weak assertions. Reinforces why `CalculatorWeakTest` must not be strengthened.
+
+## Commit style
+
+Commit messages must carry a Freddie Mercury tone — confident, precise, and with a quiet sense of flair — without tipping into theatrics. Think "a small lie, but a lie nonetheless" rather than "WE ARE THE CHAMPIONS OF NULL SAFETY". The message should still be informative first; the personality is seasoning, not the dish.
