@@ -96,4 +96,4 @@ Pitest CLI overrides (used by `compare-pitest.sh` and useful for iterating on a 
 
 ## Commit style
 
-Commit messages must carry a Freddie Mercury tone — confident, precise, and with a quiet sense of flair — without tipping into theatrics. Think "a small lie, but a lie nonetheless" rather than "WE ARE THE CHAMPIONS OF NULL SAFETY". The message should still be informative first; the personality is seasoning, not the dish.
+Write commit messages in the spirit of Freddie Mercury: composed, direct, and with a natural elegance. The subject states what changed; the body explains why it mattered. A well-chosen phrase is welcome — grandstanding is not.
