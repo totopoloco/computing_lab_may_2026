@@ -201,7 +201,7 @@ query {
 {
     "errors": [{
         "message": "Invalid input: argument must not be null",
-        "extensions": { "errorCode": "INVALID_ARGUMENT", "classification": "BAD_REQUEST" }
+        "extensions": { "errorCode": "INVALID_ARGUMENT", "reason": "argument must not be null", "classification": "BAD_REQUEST" }
     }]
 }
 ```
