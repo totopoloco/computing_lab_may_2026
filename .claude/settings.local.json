@@ -32,7 +32,14 @@
       "Bash(npm config *)",
       "Bash(npm list *)",
       "Bash(npm --version)",
-      "Bash(claude --version)"
+      "Bash(claude --version)",
+      "Bash(xargs dos2unix)",
+      "Bash(xargs chown vscode:vscode)",
+      "Bash(sudo find /workspace -not -path '*/\\\\.*' -not -path '*/build/*' -not -path '*/gradle/wrapper/*' -user root)",
+      "Bash(xargs sudo chown vscode:vscode)",
+      "Bash(curl -s http://localhost:8080/graphql -o /dev/null)",
+      "Bash(pkill -f 'bootRun')",
+      "Bash(pkill -f 'computing_lab')"
     ]
   }
 }

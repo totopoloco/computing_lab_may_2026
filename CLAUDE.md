@@ -35,7 +35,9 @@ infrastructure/
 
 **The only API is GraphQL** (`/graphql`). There are no REST controllers. The schema lives at `src/main/resources/graphql/schema.graphqls`. The GraphiQL IDE is enabled in dev at `/graphiql`. `BigDecimal` is a custom scalar registered in `GraphQLConfig`; add new scalars there.
 
-**GraphQL scalar syntax** — `BigDecimal` values must be passed as quoted strings in query documents (e.g., `add(a: "3.14", b: "2")`), not bare numbers.
+The `-parameters` compiler flag is set in `build.gradle` so Spring can bind `@QueryMapping` parameters by name. Despite this, `@Argument("name")` annotations in the controller are kept explicit — always use them when adding new query mappings.
+
+**GraphQL scalar syntax** — `BigDecimal` accepts bare integers (`add(a: 3, b: 4)`), bare floats (`add(a: 3.14, b: 2)`), and quoted strings (`add(a: "3.14", b: "2")`). All three forms are valid; the `ExtendedScalars.GraphQLBigDecimal` coercion handles all of them.
 
 When adding a new feature the full touch list is:
 
@@ -75,14 +77,14 @@ When adding a new feature the full touch list is:
 ## Testing conventions
 
 - Domain tests: `@SpringBootTest` (full context, no mocks), AssertJ assertions, exhaustive coverage of happy paths, edge cases, and constraint violations.
-- Application tests: `@Nested` inner classes using AssertJ assertions (same as domain tests).
+- Application tests: `@SpringBootTest` (full context, no mocks), `@Nested` inner classes, AssertJ assertions — same setup as domain tests.
 - GraphQL integration tests: `@SpringBootTest @AutoConfigureGraphQlTester` with an injected `GraphQlTester`; use raw GraphQL query documents, covering happy-path and error responses.
 - Mutation testing: every new domain class must maintain the project-wide ≥ 79% mutation and line coverage threshold (`./gradlew pitest`). Tests must kill mutations — avoid trivial assertions that survive mutants.
 - `CalculatorWeakTest` is an intentional educational artifact that demonstrates how imprecise assertions allow mutation survivors (e.g., `NULL_RETURNS`, `NEGATE_CONDITIONALS`). Do not strengthen it.
 
 ## Key configuration
 
-- Active profile: `dev` (H2 in-memory DB, GraphiQL enabled, `logging.pattern.console=%msg%n` for clean output)
+- Active profile: `dev` (H2 in-memory DB, GraphiQL at `/graphiql`, H2 console at `/h2-console`, `logging.pattern.console=%msg%n` for clean output)
 - Java 25 toolchain, Spring Boot 4.x
 - Pitest mutation threshold: 79%; targets `domain.*` classes only
 - JaCoCo line/branch coverage runs automatically after `./gradlew test`; report: `build/reports/jacoco/test/html/index.html`; scoped to `domain.*` + `application.*`
