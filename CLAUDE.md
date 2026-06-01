@@ -35,6 +35,8 @@ infrastructure/
 
 **The only API is GraphQL** (`/graphql`). There are no REST controllers. The schema lives at `src/main/resources/graphql/schema.graphqls`. The GraphiQL IDE is enabled in dev at `/graphiql`. `BigDecimal` is a custom scalar registered in `GraphQLConfig`; add new scalars there.
 
+**GraphQL scalar syntax** — `BigDecimal` values must be passed as quoted strings in query documents (e.g., `add(a: "3.14", b: "2")`), not bare numbers.
+
 When adding a new feature the full touch list is:
 
 1. `domain/arithmetic/<Name>.java` — `@Component @Validated` domain service
@@ -45,11 +47,13 @@ When adding a new feature the full touch list is:
 6. Tests mirroring the main package structure (`@SpringBootTest`, AssertJ for domain; `GraphQlTester` for GraphQL integration tests)
 7. Verify `./gradlew pitest` still passes (≥ 79% mutation and line coverage)
 
+**Exception handling** — `GraphQLExceptionHandler` maps two exception types to `BAD_REQUEST`: `DivisionByZeroException` (errorCode `"DIVISION_BY_ZERO"`) and `IllegalArgumentException` (errorCode `"INVALID_ARGUMENT"`). Add a new branch there for each new domain exception; returning `null` delegates to Spring's default handler, which produces `INTERNAL_ERROR`.
+
 ## Coding conventions
 
 **Null handling** — always `Objects.isNull()` / `Objects.nonNull()`, never `== null` or `!= null`.
 
-**Input validation** — domain services must use **Jakarta Bean Validation** on parameter `records`. No manual null-guard `if` statements in domain service bodies. Use custom `@Constraint` annotations when standard ones don't suffice. The application layer (`CalculatorService`) is the only place where null defaulting via `Objects.isNull()` is permitted. Domain service classes must be annotated `@Validated` for parameter-level constraints to be enforced by Spring AOP.
+**Input validation** — domain services must use **Jakarta Bean Validation** on method parameters; for methods with >3 parameters, group them into a `record` and validate the record. No manual null-guard `if` statements in domain service bodies. Use custom `@Constraint` annotations when standard ones don't suffice. The application layer (`CalculatorService`) is the only place where null defaulting via `Objects.isNull()` is permitted. Domain service classes must be annotated `@Validated` for parameter-level constraints to be enforced by Spring AOP.
 
 **Iteration** — prefer Stream API. Use enhanced for-each when index-dependent or carrying mutable state. Never use C-style indexed `for` loops when a stream or for-each suffices.
 
@@ -72,7 +76,7 @@ When adding a new feature the full touch list is:
 
 - Domain tests: `@SpringBootTest` (full context, no mocks), AssertJ assertions, exhaustive coverage of happy paths, edge cases, and constraint violations.
 - Application tests: `@Nested` inner classes using AssertJ assertions (same as domain tests).
-- GraphQL integration tests: `GraphQlTester` with raw GraphQL query documents, covering happy-path and error responses.
+- GraphQL integration tests: `@SpringBootTest @AutoConfigureGraphQlTester` with an injected `GraphQlTester`; use raw GraphQL query documents, covering happy-path and error responses.
 - Mutation testing: every new domain class must maintain the project-wide ≥ 79% mutation and line coverage threshold (`./gradlew pitest`). Tests must kill mutations — avoid trivial assertions that survive mutants.
 - `CalculatorWeakTest` is an intentional educational artifact that demonstrates how imprecise assertions allow mutation survivors (e.g., `NULL_RETURNS`, `NEGATE_CONDITIONALS`). Do not strengthen it.
 
