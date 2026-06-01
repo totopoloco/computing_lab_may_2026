@@ -1,0 +1,5 @@
+# Enforce Unix line endings for all text files in the repository.
+* text=auto eol=lf
+
+# Windows batch files need CRLF to run correctly on Windows.
+*.bat text eol=crlf

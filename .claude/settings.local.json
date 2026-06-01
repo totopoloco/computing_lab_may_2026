@@ -39,7 +39,15 @@
       "Bash(xargs sudo chown vscode:vscode)",
       "Bash(curl -s http://localhost:8080/graphql -o /dev/null)",
       "Bash(pkill -f 'bootRun')",
-      "Bash(pkill -f 'computing_lab')"
+      "Bash(pkill -f 'computing_lab')",
+      "Bash(xargs ls -la)",
+      "Bash(awk '{print $1, $3, $4, $NF}')",
+      "Bash(xargs file)",
+      "Bash(awk '{print $3, $4, $NF}')",
+      "Bash(grep -v \"^total\\\\|^\\\\.$\\\\|\\\\.\\\\.$\")",
+      "Bash(dos2unix --version)",
+      "Bash(sudo chown *)",
+      "Bash(git config *)"
     ]
   }
 }
