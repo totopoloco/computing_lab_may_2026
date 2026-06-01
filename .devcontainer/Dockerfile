@@ -19,7 +19,6 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g n && n 20
-RUN npm install -g @anthropic-ai/claude-code
 
 # Create a non-root user with sudo access
 ARG USERNAME=vscode
@@ -44,9 +43,13 @@ RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh && chmod a+x /usr/local/bin/en
 # Switch to non-root user
 USER $USERNAME
 
-# Set JAVA_HOME
+# Install claude-code into a user-writable npm prefix so auto-updates work without sudo
+RUN npm config set prefix ~/.npm-global && \
+    npm install -g @anthropic-ai/claude-code
+
+# Set JAVA_HOME and expose the user-local npm bin directory
 ENV JAVA_HOME=/opt/java/openjdk
-ENV PATH="${JAVA_HOME}/bin:${PATH}"
+ENV PATH="/home/vscode/.npm-global/bin:${JAVA_HOME}/bin:${PATH}"
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["sleep", "infinity"]
