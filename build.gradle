@@ -103,7 +103,7 @@ pitest {
     coverageThreshold = (findProperty('pitestCoverageThreshold') ?: '79').toInteger()
     junit5PluginVersion  = '1.2.1'
     pitestVersion        = '1.25.1'
-    mutators             = ['DEFAULTS']
+    mutators             = ['DEFAULTS', 'NON_VOID_METHOD_CALLS', 'REMOVE_CONDITIONALS', 'CONSTRUCTOR_CALLS', 'INLINE_CONSTS']
     outputFormats        = ['HTML', 'XML']
     threads              = 2
     timeoutConstInMillis = 60000
