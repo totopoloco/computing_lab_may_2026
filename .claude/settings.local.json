@@ -47,7 +47,8 @@
       "Bash(grep -v \"^total\\\\|^\\\\.$\\\\|\\\\.\\\\.$\")",
       "Bash(dos2unix --version)",
       "Bash(sudo chown *)",
-      "Bash(git config *)"
+      "Bash(git config *)",
+      "Bash(devcontainer --version)"
     ]
   }
 }
