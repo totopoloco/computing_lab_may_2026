@@ -48,7 +48,17 @@
       "Bash(dos2unix --version)",
       "Bash(sudo chown *)",
       "Bash(git config *)",
-      "Bash(devcontainer --version)"
+      "Bash(devcontainer --version)",
+      "Bash(grep -E \"\\\\.class$\")",
+      "Bash(xargs -I{} sh -c 'cd /tmp && jar xf {} org/springframework/boot/graphql/test/autoconfigure/tester/GraphQlTesterAutoConfiguration.class && javap -c org/springframework/boot/graphql/test/autoconfigure/tester/GraphQlTesterAutoConfiguration.class 2>/dev/null')",
+      "Bash(jar xf *)",
+      "Bash(javap -c org/springframework/boot/graphql/test/autoconfigure/tester/HttpGraphQlTesterAutoConfiguration.class)",
+      "Bash(jar xvf *)",
+      "Bash(./gradlew dependencies *)",
+      "Bash(curl -s \"https://search.maven.org/solrsearch/select?q=g:com.github.loki4j+AND+a:loki-logback-appender&rows=1&wt=json\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d['response']['docs'][0]['latestVersion']\\)\")",
+      "Bash(xargs -I{} sh -c 'jar tf \"$1\" 2>/dev/null | grep \"base.xml\" && echo \"$1\"' _ {})",
+      "Bash(./gradlew cleanTest test --info)"
     ]
   }
 }

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- Inherit Spring Boot's default console appender and log-level wiring. -->
+  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+  <springProperty name="appName" source="spring.application.name" defaultValue="computing-lab"/>
+
+  <!--
+    Push logs to Loki in the dev profile.
+    The appender is non-blocking: batches are shipped asynchronously so a Loki outage
+    never stalls request processing. Connection failures are suppressed after a short
+    timeout so local runs without Docker Compose remain unaffected.
+  -->
+  <!--
+    The "loki" profile is activated only by Docker Compose (SPRING_PROFILES_ACTIVE=dev,loki).
+    It is intentionally absent from application.properties so that local runs and test suites
+    never attempt to reach the Loki container — loki4j's DNS failure would otherwise be
+    reported as an ERROR in Logback's StatusManager and cause context startup to fail.
+  -->
+  <springProfile name="loki">
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+      <http>
+        <url>http://loki:3100/loki/api/v1/push</url>
+        <connectionTimeoutMs>1000</connectionTimeoutMs>
+        <requestTimeoutMs>3000</requestTimeoutMs>
+      </http>
+      <format>
+        <label>
+          <pattern>service=${appName},level=%level</pattern>
+        </label>
+        <message>
+          <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </message>
+        <sortByTime>true</sortByTime>
+      </format>
+    </appender>
+
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="LOKI"/>
+    </root>
+  </springProfile>
+
+</configuration>
