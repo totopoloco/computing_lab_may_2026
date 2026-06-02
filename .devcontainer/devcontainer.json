@@ -58,7 +58,9 @@
   "forwardPorts": [
     8080,
     5005,
-    8081
+    8081,
+    9090,
+    3000
   ],
   // Port labels for better identification
   "portsAttributes": {
@@ -73,6 +75,14 @@
     "8081": {
       "label": "Actuator",
       "onAutoForward": "silent"
+    },
+    "9090": {
+      "label": "Prometheus",
+      "onAutoForward": "silent"
+    },
+    "3000": {
+      "label": "Grafana",
+      "onAutoForward": "notify"
     }
   },
   // Lifecycle scripts
