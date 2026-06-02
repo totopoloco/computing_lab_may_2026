@@ -37,6 +37,7 @@ src/main/java/at/mavila/computing_lab_may_2026/
 1. [Calculator](#1-calculator)
 2. [GraphQL API](#2-graphql-api)
 3. [Testing Quality](#3-testing-quality)
+4. [Observability](#4-observability)
 
 ---
 
@@ -292,6 +293,107 @@ Reports for each run are preserved under `build/reports/pitest-strong/` and `bui
 
 ---
 
+## 4. Observability
+
+The dev stack ships a pre-wired observability pipeline: **Prometheus** for metrics, **Loki** for logs, and **Grafana** for dashboards. Everything starts automatically with Docker Compose and requires no manual configuration.
+
+### Stack
+
+| Service    | Port | Purpose                                           |
+| ---------- | ---- | ------------------------------------------------- |
+| App        | 8080 | Spring Boot application                           |
+| Grafana    | 3000 | Dashboard UI (anonymous admin, no login required) |
+| Prometheus | 9090 | Metrics store — scrapes `/actuator/prometheus`    |
+| Loki       | 3100 | Log aggregation — receives push from Loki4j       |
+
+### Accessing the Tools
+
+Open these in a browser (forward the ports from the devcontainer if needed):
+
+| Tool            | URL                             |
+| --------------- | ------------------------------- |
+| Grafana         | `http://localhost:3000`         |
+| GraphiQL        | `http://localhost:8080/graphiql`|
+| Prometheus      | `http://localhost:9090`         |
+| Actuator health | `http://localhost:8080/actuator/health` |
+
+### Grafana Dashboard
+
+The dashboard **Computing Lab — Spring Boot Overview** is provisioned automatically at startup. It is split into six sections:
+
+| Section                  | Panels                                                                  |
+| ------------------------ | ----------------------------------------------------------------------- |
+| **Application Overview** | Uptime · Heap Used · CPU Usage · GraphQL Request Rate                   |
+| **JVM Memory**           | Heap over time · Non-Heap over time · Heap Utilization gauge            |
+| **GraphQL & HTTP**       | Request rate · Response-time percentiles (p50/p95/p99) · Status breakdown |
+| **Incoming Request Logs**| Live log stream of every `GRAPHQL_REQUEST` entry from Loki              |
+| **JVM Runtime**          | CPU usage · GC pause duration · Live thread count                       |
+| **Errors**               | HTTP 4xx/5xx error rate · Error distribution pie chart                  |
+
+### Prometheus Metrics
+
+Prometheus scrapes `/actuator/prometheus` every 15 seconds (job `computing_lab_may_2026`). Key metrics used by the dashboard:
+
+| Metric                                    | What it measures                              |
+| ----------------------------------------- | --------------------------------------------- |
+| `process_uptime_seconds`                  | Application uptime                            |
+| `jvm_memory_used_bytes{area="heap"}`      | Heap memory in use                            |
+| `jvm_memory_max_bytes{area="heap"}`       | Max heap — used for utilisation %             |
+| `http_server_requests_seconds_count`      | Request throughput, filtered to `uri="/graphql"` |
+| `http_server_requests_seconds_bucket`     | Latency histogram for p50/p95/p99 percentiles |
+| `process_cpu_usage`                       | CPU utilisation (0–1 normalised to %)         |
+| `jvm_gc_pause_seconds_sum`                | GC pause time per interval                    |
+| `jvm_threads_live_threads`                | Live JVM thread count                         |
+
+SLO histogram buckets are configured in `application.properties`:
+
+```properties
+management.metrics.distribution.percentiles-histogram.http.server.requests=true
+management.metrics.distribution.slo.http.server.requests=1ms,5ms,10ms,25ms,50ms,100ms
+```
+
+### Log Streaming with Loki
+
+Every incoming GraphQL request is logged by `GraphQlRequestLoggingInterceptor` (in `infrastructure/web/graphql/`) as a structured `INFO` line:
+
+```
+GRAPHQL_REQUEST remoteIp="<ip>" uri="<uri>" document="<query>" variables="<vars>"
+```
+
+Loki4j (logback appender) batches these lines and pushes them to Loki with stream labels:
+
+| Label     | Value                       | Source                         |
+| --------- | --------------------------- | ------------------------------ |
+| `service` | `computing_lab_may_2026`    | `spring.application.name`      |
+| `level`   | e.g. `INFO`                 | log level of the event         |
+
+The Grafana Logs panel queries these with:
+
+```logql
+{service="computing_lab_may_2026"} |= "GRAPHQL_REQUEST"
+```
+
+#### The `loki` Spring Profile
+
+The Loki4j appender is guarded by the `loki` Spring profile so that local runs and test suites never attempt a DNS lookup for the `loki` container:
+
+```properties
+# docker-compose.yml injects this into the app container
+SPRING_PROFILES_ACTIVE=dev,loki
+```
+
+When the `loki` profile is **not** active (plain `./gradlew bootRun` outside Docker Compose), the appender block in `logback-spring.xml` is skipped entirely. No connection errors, no log noise.
+
+#### Loki4j 2.x Configuration Note
+
+Loki4j 2.x changed the XML configuration format from 1.x. Key differences relevant to `logback-spring.xml`:
+
+- No `<format>` wrapper — `<labels>` and `<message>` are top-level appender elements.
+- `<labels>` pairs are separated by **newlines** (`KV_PAIR_SEPARATOR = regex:\n|\r`), not commas. Comma-separated pairs throw `IllegalArgumentException` at startup.
+- `<message>` takes a full Logback `Layout`; use `class="ch.qos.logback.classic.PatternLayout"` explicitly.
+
+---
+
 ## Running the Project
 
 ### Prerequisites
@@ -318,7 +420,8 @@ Run a single test class:
 
 ### Key Configuration
 
-- Active profile: `dev` (H2 in-memory DB, GraphiQL enabled)
+- Active profile: `dev` (H2 in-memory DB, GraphiQL enabled at `/graphiql`)
+- Observability profile: `loki` — activated by Docker Compose (`SPRING_PROFILES_ACTIVE=dev,loki`); enables the Loki4j log appender
 - Java 25 toolchain, Spring Boot 4.x
 - Pitest mutation threshold: ≥ 79%; overridable via `-PpitestMutationThreshold` and `-PpitestCoverageThreshold`
 - Pitest target tests: defaults to `domain.*`; overridable via `-PpitestTargetTests`
