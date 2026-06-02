@@ -76,9 +76,10 @@ When adding a new feature the full touch list is:
 
 ## Testing conventions
 
-- Domain tests: `@SpringBootTest` (full context, no mocks), AssertJ assertions, exhaustive coverage of happy paths, edge cases, and constraint violations.
+- Domain tests: `@SpringBootTest` (full context, no mocks), `@Nested` inner classes, AssertJ assertions, exhaustive coverage of happy paths, edge cases, and constraint violations.
 - Application tests: `@SpringBootTest` (full context, no mocks), `@Nested` inner classes, AssertJ assertions — same setup as domain tests.
-- GraphQL integration tests: `@SpringBootTest @AutoConfigureGraphQlTester` with an injected `GraphQlTester`; use raw GraphQL query documents, covering happy-path and error responses.
+- GraphQL integration tests: `@SpringBootTest @AutoConfigureGraphQlTester` with an injected `GraphQlTester`; use raw GraphQL query documents, covering happy-path and error responses. Import `@AutoConfigureGraphQlTester` from `org.springframework.boot.graphql.test.autoconfigure.tester` (Spring Boot 4.x path — the old `org.springframework.graphql.test.tester` package no longer applies).
+- **BigDecimal assertions** — always use `isEqualByComparingTo(new BigDecimal("..."))`, never `isEqualTo()`. `BigDecimal.equals` is scale-sensitive: `new BigDecimal("3.0").equals(new BigDecimal("3.00"))` is `false`, so `isEqualTo` produces false negatives.
 - Mutation testing: every new domain class must maintain the project-wide ≥ 79% mutation and line coverage threshold (`./gradlew pitest`). Tests must kill mutations — avoid trivial assertions that survive mutants.
 - `CalculatorWeakTest` is an intentional educational artifact that demonstrates how imprecise assertions allow mutation survivors (e.g., `NULL_RETURNS`, `NEGATE_CONDITIONALS`). Do not strengthen it.
 
