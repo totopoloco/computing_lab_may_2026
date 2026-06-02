@@ -1,5 +1,6 @@
 package at.mavila.computing_lab_may_2026.infrastructure.web.graphql;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,8 +34,8 @@ import reactor.core.publisher.Mono;
  * <li>{@code X-Forwarded-For} — first token (leftmost client, de-facto standard
  * behind proxies)</li>
  * <li>{@code X-Real-IP} — set by nginx when XFF is absent</li>
- * <li>{@code "unknown"} — no proxy header present (direct connection or
- * stripped by proxy)</li>
+ * <li>Raw socket address — used for direct connections with no proxy headers</li>
+ * <li>{@code "unknown"} — address is genuinely indeterminate</li>
  * </ol>
  *
  * <h2>Payload truncation</h2>
@@ -75,7 +76,7 @@ public class GraphQlRequestLoggingInterceptor implements WebGraphQlInterceptor {
 
     LOG.info(
         "GRAPHQL_REQUEST remoteIp=\"{}\" uri=\"{}\" document=\"{}\" variables=\"{}\"",
-        resolveRemoteIp(request.getHeaders()),
+        resolveRemoteIp(request.getHeaders(), request.getRemoteAddress()),
         request.getUri(),
         truncate(request.getDocument()),
         truncate(request.getVariables().toString()));
@@ -84,13 +85,19 @@ public class GraphQlRequestLoggingInterceptor implements WebGraphQlInterceptor {
   }
 
   /**
-   * Resolves the effective remote IP from proxy headers, falling back to
-   * {@code "unknown"}.
+   * Resolves the effective remote IP using the following priority order:
+   * <ol>
+   * <li>{@code X-Forwarded-For} first token (leftmost client behind proxies)</li>
+   * <li>{@code X-Real-IP} (set by nginx when XFF is absent)</li>
+   * <li>The raw socket address from the connection</li>
+   * <li>{@code "unknown"} when none of the above is available</li>
+   * </ol>
    *
-   * @param headers the HTTP headers of the incoming request
+   * @param headers       the HTTP headers of the incoming request
+   * @param remoteAddress the socket-level remote address; may be {@code null}
    * @return the resolved IP string; never {@code null}
    */
-  private String resolveRemoteIp(final HttpHeaders headers) {
+  private String resolveRemoteIp(final HttpHeaders headers, final InetSocketAddress remoteAddress) {
 
     final List<String> forwarded = headers.get("X-Forwarded-For");
 
@@ -102,6 +109,10 @@ public class GraphQlRequestLoggingInterceptor implements WebGraphQlInterceptor {
 
     if (!CollectionUtils.isEmpty(realIp)) {
       return realIp.get(0);
+    }
+
+    if (Objects.nonNull(remoteAddress) && Objects.nonNull(remoteAddress.getAddress())) {
+      return remoteAddress.getAddress().getHostAddress();
     }
 
     return UNKNOWN;

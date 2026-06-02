@@ -16,6 +16,17 @@
         Comma-separated pairs are NOT supported and throw IllegalArgumentException
       - <message> is a Logback Layout (PatternLayout here)
   -->
+  <!--
+    Suppress the per-request GRAPHQL_REQUEST line from the console when Loki is not
+    active. When the loki profile IS active the root logger below points exclusively at
+    the Loki appender, so this block is not reached and the interceptor's messages flow
+    to Loki as normal.
+  -->
+  <springProfile name="!loki">
+    <logger name="at.mavila.computing_lab_may_2026.infrastructure.web.graphql.GraphQlRequestLoggingInterceptor"
+            level="OFF"/>
+  </springProfile>
+
   <springProfile name="loki">
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
       <http>

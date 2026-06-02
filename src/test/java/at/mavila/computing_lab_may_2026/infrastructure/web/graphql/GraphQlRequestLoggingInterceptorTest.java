@@ -37,7 +37,8 @@ import org.springframework.web.client.RestClient;
  * @author mavila
  * @since June 2026
  */
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
+    properties = "logging.level.at.mavila.computing_lab_may_2026.infrastructure.web.graphql.GraphQlRequestLoggingInterceptor=INFO")
 @ExtendWith(OutputCaptureExtension.class)
 class GraphQlRequestLoggingInterceptorTest {
 
@@ -90,6 +91,13 @@ class GraphQlRequestLoggingInterceptorTest {
       sendQuery("{ add(a: 1, b: 2) }");
 
       assertThat(output.toString()).contains("remoteIp=");
+    }
+
+    @Test
+    void logsActualIpForDirectConnection() {
+      sendQuery("{ add(a: 1, b: 2) }");
+
+      assertThat(output.toString()).contains("remoteIp=\"127.0.0.1\"");
     }
 
     @Test
