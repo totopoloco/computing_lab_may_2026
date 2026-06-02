@@ -3,19 +3,18 @@
   <!-- Inherit Spring Boot's default console appender and log-level wiring. -->
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
-  <springProperty name="appName" source="spring.application.name" defaultValue="computing-lab"/>
+  <springProperty name="appName" source="spring.application.name" defaultValue="computing_lab_may_2026"/>
 
   <!--
-    Push logs to Loki in the dev profile.
+    Push logs to Loki in the loki profile (activated via SPRING_PROFILES_ACTIVE=dev,loki).
     The appender is non-blocking: batches are shipped asynchronously so a Loki outage
-    never stalls request processing. Connection failures are suppressed after a short
-    timeout so local runs without Docker Compose remain unaffected.
-  -->
-  <!--
-    The "loki" profile is activated only by Docker Compose (SPRING_PROFILES_ACTIVE=dev,loki).
-    It is intentionally absent from application.properties so that local runs and test suites
-    never attempt to reach the Loki container — loki4j's DNS failure would otherwise be
-    reported as an ERROR in Logback's StatusManager and cause context startup to fail.
+    never stalls request processing.
+
+    Loki4j 2.x API differences from 1.x:
+      - No <format> wrapper; top-level <labels>, <message>, <structuredMetadata>
+      - <labels> is newline-separated key=value pairs (KV_PAIR_SEPARATOR = regex:\n|\r)
+        Comma-separated pairs are NOT supported and throw IllegalArgumentException
+      - <message> is a Logback Layout (PatternLayout here)
   -->
   <springProfile name="loki">
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
@@ -24,15 +23,13 @@
         <connectionTimeoutMs>1000</connectionTimeoutMs>
         <requestTimeoutMs>3000</requestTimeoutMs>
       </http>
-      <format>
-        <label>
-          <pattern>service=${appName},level=%level</pattern>
-        </label>
-        <message>
-          <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
-        </message>
-        <sortByTime>true</sortByTime>
-      </format>
+      <labels>
+service=${appName}
+level=%level
+      </labels>
+      <message class="ch.qos.logback.classic.PatternLayout">
+        <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+      </message>
     </appender>
 
     <root level="INFO">
