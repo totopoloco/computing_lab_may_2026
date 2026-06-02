@@ -37,7 +37,8 @@
         "yashar-zolmajdi.graphql-complexity-vscode",
         "codescene.codescene-vscode",
         "sonarsource.sonarlint-vscode",
-        "anthropic.claude-code"
+        "anthropic.claude-code",
+        "graphql.vscode-graphql"
       ],
       // VS Code settings
       "settings": {

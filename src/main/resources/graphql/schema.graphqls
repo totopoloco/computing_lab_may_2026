@@ -1,28 +1,28 @@
 type Query {
-    """
-    Adds two numbers and returns the result.
-    Supports arbitrary-precision arithmetic via BigDecimal.
-    """
-    add(a: BigDecimal!, b: BigDecimal!): BigDecimal!
+  """
+  Adds two numbers and returns the result.
+  Supports arbitrary-precision arithmetic via BigDecimal.
+  """
+  add(a: BigDecimal!, b: BigDecimal!): BigDecimal!
 
-    """
-    Subtracts b from a and returns the result.
-    Supports arbitrary-precision arithmetic via BigDecimal.
-    """
-    subtract(a: BigDecimal!, b: BigDecimal!): BigDecimal!
+  """
+  Subtracts b from a and returns the result.
+  Supports arbitrary-precision arithmetic via BigDecimal.
+  """
+  subtract(a: BigDecimal!, b: BigDecimal!): BigDecimal!
 
-    """
-    Multiplies two numbers and returns the result.
-    Supports arbitrary-precision arithmetic via BigDecimal.
-    """
-    multiply(a: BigDecimal!, b: BigDecimal!): BigDecimal!
+  """
+  Multiplies two numbers and returns the result.
+  Supports arbitrary-precision arithmetic via BigDecimal.
+  """
+  multiply(a: BigDecimal!, b: BigDecimal!): BigDecimal!
 
-    """
-    Divides a by b and returns the result rounded to 10 decimal places (HALF_UP).
-    Throws an error if b is zero.
-    Supports arbitrary-precision arithmetic via BigDecimal.
-    """
-    divide(a: BigDecimal!, b: BigDecimal!): BigDecimal!
+  """
+  Divides a by b and returns the result rounded to 10 decimal places (HALF_UP).
+  Throws an error if b is zero.
+  Supports arbitrary-precision arithmetic via BigDecimal.
+  """
+  divide(a: BigDecimal!, b: BigDecimal!): BigDecimal!
 }
 
 """
