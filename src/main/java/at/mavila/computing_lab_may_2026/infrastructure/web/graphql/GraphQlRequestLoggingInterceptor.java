@@ -54,13 +54,15 @@ public class GraphQlRequestLoggingInterceptor implements WebGraphQlInterceptor {
    */
   @Override
   public Mono<WebGraphQlResponse> intercept(final WebGraphQlRequest request, final Chain chain) {
-    final String remoteIp = resolveRemoteIp(request.getHeaders());
-    LOG.info(
-        "GRAPHQL_REQUEST remoteIp=\"{}\" uri=\"{}\" document=\"{}\" variables=\"{}\"",
-        remoteIp,
-        request.getUri(),
-        truncate(request.getDocument()),
-        truncate(request.getVariables().toString()));
+    if (!request.getDocument().contains("__schema")) {
+      final String remoteIp = resolveRemoteIp(request.getHeaders());
+      LOG.info(
+          "GRAPHQL_REQUEST remoteIp=\"{}\" uri=\"{}\" document=\"{}\" variables=\"{}\"",
+          remoteIp,
+          request.getUri(),
+          truncate(request.getDocument()),
+          truncate(request.getVariables().toString()));
+    }
     return chain.next(request);
   }
 

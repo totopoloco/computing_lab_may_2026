@@ -109,6 +109,18 @@ class GraphQlRequestLoggingInterceptorTest {
   }
 
   @Nested
+  class IntrospectionFiltering {
+
+    @Test
+    void doesNotLogIntrospectionQuery() {
+      sendQuery("{ __schema { queryType { name } } }");
+
+      assertThat(output.toString()).doesNotContain("GRAPHQL_REQUEST");
+    }
+
+  }
+
+  @Nested
   class Truncation {
 
     @Test
