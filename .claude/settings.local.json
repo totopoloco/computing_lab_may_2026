@@ -58,7 +58,28 @@
       "Bash(curl -s \"https://search.maven.org/solrsearch/select?q=g:com.github.loki4j+AND+a:loki-logback-appender&rows=1&wt=json\")",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d['response']['docs'][0]['latestVersion']\\)\")",
       "Bash(xargs -I{} sh -c 'jar tf \"$1\" 2>/dev/null | grep \"base.xml\" && echo \"$1\"' _ {})",
-      "Bash(./gradlew cleanTest test --info)"
+      "Bash(./gradlew cleanTest test --info)",
+      "Bash(curl -s http://loki:3100/ready)",
+      "Bash(curl -s http://loki:3100/loki/api/v1/labels)",
+      "Bash(curl -s \"http://loki:3100/loki/api/v1/label/service_name/values\")",
+      "Bash(curl -s \"http://loki:3100/loki/api/v1/label/app/values\")",
+      "Bash(curl -s \"http://localhost:8080/actuator/health\")",
+      "Bash(curl -s \"http://localhost:8080/actuator/env\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('activeProfiles:', d.get\\('activeProfiles',[]\\)\\)\")",
+      "Bash(curl -s 'http://loki:3100/loki/api/v1/query_range?query=%7Bapp%3D%22default%22%7D&limit=3')",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); streams=d.get\\('data',{}\\).get\\('result',[]\\); [print\\(s['stream'], '|', s['values'][0][1][:200] if s['values'] else ''\\) for s in streams]\")",
+      "Bash(xargs -I{} jar tf \"{}\")",
+      "Bash(curl -s \"http://localhost:8080/actuator/conditions\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s \"http://loki:3100/loki/api/v1/label/service/values\")",
+      "Bash(javap -verbose com/github/loki4j/logback/Loki4jAppender.class)",
+      "Bash(javap -p com/github/loki4j/logback/Loki4jAppender.class)",
+      "Bash(kill -TERM 4093)",
+      "Bash(echo \"Restarting app, PID=$!\")",
+      "Bash(echo \"Restart PID=$!\")",
+      "Bash(curl -s \"http://loki:3100/loki/api/v1/labels\")",
+      "Bash(curl -s 'http://loki:3100/loki/api/v1/query_range?query=%7Bservice%3D%22computing_lab_may_2026%22%7D%20%7C%3D%20%22GRAPHQL_REQUEST%22&limit=3')",
+      "Bash(curl -s -X POST http://localhost:8080/graphql -H 'Content-Type: application/json' -d '{\"query\":\"{ add\\(a: 1, b: 2\\) }\"}')"
     ]
   }
 }
