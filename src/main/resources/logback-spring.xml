@@ -32,9 +32,27 @@ level=%level
       </message>
     </appender>
 
-    <root level="INFO">
+    <!--
+      GRAPHQL_REQUEST lines are a Loki-only concern.
+
+      additivity="false" stops this logger from propagating up to the root
+      logger, whose CONSOLE appender comes from base.xml. The line therefore
+      ships to Loki without ever touching the server console.
+
+      Because LOKI is attached ONLY here — and deliberately NOT to <root> — Loki
+      receives these request lines and nothing else, satisfying the "Grafana
+      shows only GRAPHQL_REQUEST" requirement.
+
+      The level itself is driven by
+      logging.level.<...>.GraphQlRequestLoggingInterceptor
+      (OFF in application-dev.properties, INFO in application-loki.properties),
+      so dev-only runs stay silent and dev,loki runs emit at INFO.
+    -->
+    <logger
+        name="at.mavila.computing_lab_may_2026.infrastructure.web.graphql.GraphQlRequestLoggingInterceptor"
+        additivity="false">
       <appender-ref ref="LOKI"/>
-    </root>
+    </logger>
   </springProfile>
 
 </configuration>

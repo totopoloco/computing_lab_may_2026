@@ -2,6 +2,7 @@ package at.mavila.computing_lab_may_2026.application.arithmetic;
 
 import java.math.BigDecimal;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import at.mavila.computing_lab_may_2026.domain.arithmetic.Calculator;
@@ -11,9 +12,12 @@ import lombok.RequiredArgsConstructor;
  * Application service that delegates arithmetic operations to the domain layer.
  *
  * <p>
- * This service acts as a facade for the infrastructure layer (GraphQL) to access all
- * calculator operations. It coordinates the {@link Calculator} domain service and
- * enforces application-level concerns such as input defaulting before calling into
+ * This service acts as a facade for the infrastructure layer (GraphQL) to
+ * access all
+ * calculator operations. It coordinates the {@link Calculator} domain service
+ * and
+ * enforces application-level concerns such as input defaulting before calling
+ * into
  * the domain.
  * </p>
  *
@@ -29,7 +33,7 @@ import lombok.RequiredArgsConstructor;
  * @see Calculator
  */
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CalculatorService {
 
   private final Calculator calculator;
@@ -42,7 +46,7 @@ public class CalculatorService {
    * @return {@code a + b}
    */
   public BigDecimal add(final BigDecimal a, final BigDecimal b) {
-    return calculator.add(a, b);
+    return this.calculator.add(a, b);
   }
 
   /**
@@ -53,7 +57,7 @@ public class CalculatorService {
    * @return {@code a - b}
    */
   public BigDecimal subtract(final BigDecimal a, final BigDecimal b) {
-    return calculator.subtract(a, b);
+    return this.calculator.subtract(a, b);
   }
 
   /**
@@ -64,7 +68,7 @@ public class CalculatorService {
    * @return {@code a * b}
    */
   public BigDecimal multiply(final BigDecimal a, final BigDecimal b) {
-    return calculator.multiply(a, b);
+    return this.calculator.multiply(a, b);
   }
 
   /**
@@ -74,10 +78,13 @@ public class CalculatorService {
    * @param b the divisor; must not be zero
    * @return {@code a / b} rounded to 10 decimal places
    * @throws at.mavila.computing_lab_may_2026.domain.arithmetic.exception.DivisionByZeroException
-   *             if {@code b} is zero
+   *                                                                                              if
+   *                                                                                              {@code b}
+   *                                                                                              is
+   *                                                                                              zero
    */
   public BigDecimal divide(final BigDecimal a, final BigDecimal b) {
-    return calculator.divide(a, b);
+    return this.calculator.divide(a, b);
   }
 
 }

@@ -79,7 +79,12 @@
       "Bash(echo \"Restart PID=$!\")",
       "Bash(curl -s \"http://loki:3100/loki/api/v1/labels\")",
       "Bash(curl -s 'http://loki:3100/loki/api/v1/query_range?query=%7Bservice%3D%22computing_lab_may_2026%22%7D%20%7C%3D%20%22GRAPHQL_REQUEST%22&limit=3')",
-      "Bash(curl -s -X POST http://localhost:8080/graphql -H 'Content-Type: application/json' -d '{\"query\":\"{ add\\(a: 1, b: 2\\) }\"}')"
+      "Bash(curl -s -X POST http://localhost:8080/graphql -H 'Content-Type: application/json' -d '{\"query\":\"{ add\\(a: 1, b: 2\\) }\"}')",
+      "Bash(echo \"exit:$?\")",
+      "Bash(python3 -c \"import xml.dom.minidom,sys; xml.dom.minidom.parse\\('src/main/resources/logback-spring.xml'\\); print\\('logback-spring.xml: well-formed XML OK'\\)\")",
+      "Bash(curl -s -o /dev/null -w \"loki /ready -> HTTP %{http_code}\\\\n\" --max-time 3 http://loki:3100/ready)",
+      "Bash(ps -eo pid,ppid,etime,cmd)",
+      "Bash(curl -s -X POST http://localhost:8081/graphql -H 'Content-Type: application/json' -d '{\"query\":\"query MyQuery { multiply\\(a: \\\\\"10.256\\\\\", b: \\\\\"43.969\\\\\"\\) }\"}')"
     ]
   }
 }
