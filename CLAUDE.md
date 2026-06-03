@@ -86,6 +86,7 @@ When adding a new feature the full touch list is:
 ## Key configuration
 
 - Active profile: `dev` (H2 in-memory DB, GraphiQL at `/graphiql`, H2 console at `/h2-console`, `logging.pattern.console=%msg%n` for clean output)
+- Logging & observability: see [LOGGING.md](LOGGING.md) — covers the Console/Loki sink split, the `additivity="false"` routing rule, and how to add new Loki-only loggers (e.g. `ExceptionLoggingInterceptor`)
 - Java 25 toolchain, Spring Boot 4.x
 - Pitest mutation threshold: 79%; targets `domain.*` classes only
 - JaCoCo line/branch coverage runs automatically after `./gradlew test`; report: `build/reports/jacoco/test/html/index.html`; scoped to `domain.*` + `application.*`
