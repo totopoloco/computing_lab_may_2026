@@ -84,7 +84,9 @@
       "Bash(python3 -c \"import xml.dom.minidom,sys; xml.dom.minidom.parse\\('src/main/resources/logback-spring.xml'\\); print\\('logback-spring.xml: well-formed XML OK'\\)\")",
       "Bash(curl -s -o /dev/null -w \"loki /ready -> HTTP %{http_code}\\\\n\" --max-time 3 http://loki:3100/ready)",
       "Bash(ps -eo pid,ppid,etime,cmd)",
-      "Bash(curl -s -X POST http://localhost:8081/graphql -H 'Content-Type: application/json' -d '{\"query\":\"query MyQuery { multiply\\(a: \\\\\"10.256\\\\\", b: \\\\\"43.969\\\\\"\\) }\"}')"
+      "Bash(curl -s -X POST http://localhost:8081/graphql -H 'Content-Type: application/json' -d '{\"query\":\"query MyQuery { multiply\\(a: \\\\\"10.256\\\\\", b: \\\\\"43.969\\\\\"\\) }\"}')",
+      "Bash(python3 -c \"import json; json.load\\(open\\('/workspace/.devcontainer/grafana/dashboards/computing-lab-overview.json'\\)\\); print\\('JSON is valid'\\)\")",
+      "Bash(python3 -c \"import json; json.load\\(open\\('/workspace/.devcontainer/grafana/dashboards/computing-lab-overview.json'\\)\\); print\\('JSON valid'\\)\")"
     ]
   }
 }
