@@ -86,7 +86,26 @@
       "Bash(ps -eo pid,ppid,etime,cmd)",
       "Bash(curl -s -X POST http://localhost:8081/graphql -H 'Content-Type: application/json' -d '{\"query\":\"query MyQuery { multiply\\(a: \\\\\"10.256\\\\\", b: \\\\\"43.969\\\\\"\\) }\"}')",
       "Bash(python3 -c \"import json; json.load\\(open\\('/workspace/.devcontainer/grafana/dashboards/computing-lab-overview.json'\\)\\); print\\('JSON is valid'\\)\")",
-      "Bash(python3 -c \"import json; json.load\\(open\\('/workspace/.devcontainer/grafana/dashboards/computing-lab-overview.json'\\)\\); print\\('JSON valid'\\)\")"
+      "Bash(python3 -c \"import json; json.load\\(open\\('/workspace/.devcontainer/grafana/dashboards/computing-lab-overview.json'\\)\\); print\\('JSON valid'\\)\")",
+      "Bash(sudo apt-get update)",
+      "Bash(sudo DEBIAN_FRONTEND=noninteractive apt-get install -y pandoc texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-xetex)",
+      "Bash(chmod a+x /workspace/scripts/compile-docs.sh)",
+      "Bash(./scripts/compile-docs.sh)",
+      "Bash(pandoc /workspace/docs/OBSERVABILITY.md --pdf-engine=xelatex --variable geometry:margin=2.5cm --variable fontsize=11pt --variable colorlinks=true -o /workspace/docs/OBSERVABILITY.pdf)",
+      "Bash(chmod u+w /workspace/docs/OBSERVABILITY.pdf)",
+      "Bash(pandoc /workspace/docs/OBSERVABILITY.md --pdf-engine=xelatex --variable geometry:margin=2.5cm --variable fontsize=11pt --variable colorlinks=true --variable 'mainfont=DejaVu Serif' --variable 'monofont=DejaVu Sans Mono' -o /workspace/docs/OBSERVABILITY.pdf)",
+      "Bash(pandoc /workspace/docs/OBSERVABILITY.md --pdf-engine=xelatex --variable geometry:margin=2.5cm --variable fontsize=11pt --variable colorlinks=true --variable 'mainfont=DejaVu Serif' --variable 'monofont=DejaVu Sans Mono' -o /tmp/OBSERVABILITY.pdf)",
+      "Bash(cp /tmp/OBSERVABILITY.pdf /workspace/docs/OBSERVABILITY.pdf)",
+      "Bash(sort -t_ -k1)",
+      "Bash(find /tmp /var/tmp /run /home/vscode/.config -name \"*.png\" -o -name \"*.jpg\" -o -name \"*.jpeg\" -o -name \"*.webp\" 2>/dev/null | grep -v \".vscode-server\\\\|plugins\\\\|extensions\" | head -30)",
+      "Read(//var/tmp/**)",
+      "Bash(mv \"Screenshot 2026-06-08 115337.jpg\" grafana-dashboard-overview.jpg)",
+      "Bash(mv \"Screenshot 2026-06-08 115423.jpg\" grafana-row1-application-overview.jpg)",
+      "Bash(mv \"Screenshot 2026-06-08 115453.jpg\" grafana-row2-jvm-memory.jpg)",
+      "Bash(mv \"Screenshot 2026-06-08 115526.jpg\" grafana-row3-graphql-http.jpg)",
+      "Bash(mv \"Screenshot 2026-06-08 115616.jpg\" grafana-row4-incoming-request-logs.jpg)",
+      "Bash(rm -f /workspace/docs/OBSERVABILITY.pdf)",
+      "Bash(pandoc OBSERVABILITY.md --pdf-engine=xelatex --variable geometry:margin=2.5cm --variable fontsize=11pt --variable colorlinks=true --variable 'mainfont=DejaVu Serif' --variable 'monofont=DejaVu Sans Mono' -o OBSERVABILITY.pdf)"
     ]
   }
 }
