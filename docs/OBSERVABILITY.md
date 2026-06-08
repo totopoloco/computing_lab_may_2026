@@ -86,53 +86,230 @@ Prometheus every 30 seconds and defaults to the last hour.
 The Prometheus scrape target is `http://app:8080/actuator/prometheus`, polled
 every 15 seconds. All panels below are scoped to `job="computing_lab_may_2026"`.
 
+![Grafana dashboard — collapsed row overview](images/grafana-dashboard-overview.jpg)
+
 ### Row 1 — Application Overview (stat panels)
 
 These are single-value indicators at the top of the dashboard. They give a
 health snapshot without requiring any time-series context.
 
-| Panel | Metric | What it measures | What to watch |
-|---|---|---|---|
-| **Uptime** | `process_uptime_seconds` | How long the JVM process has been running, formatted as days/hours/min | A reset to 0 means the app crashed or was restarted; investigate if unexpected |
-| **Heap Used** | `sum(jvm_memory_used_bytes{area="heap"})` | Current heap consumption in bytes | Orange background >256 MB, red >512 MB; a value near the red threshold warrants a heap dump or review of object retention |
-| **CPU Usage** | `process_cpu_usage * 100` | CPU time consumed by the JVM process as a percentage | Orange >70 %, red >90 %; sustained high CPU under normal load indicates a hot loop or excessive GC |
-| **GraphQL Request Rate** | `rate(http_server_requests_seconds_count{uri="/graphql"}[1m])` | Requests per second to the `/graphql` endpoint over the last minute | Confirms that the load generator or manual traffic is actually reaching the app; 0 means nothing is hitting it |
+![Row 1 — Application Overview](images/grafana-row1-application-overview.jpg)
+
+**Uptime**
+
+```
+process_uptime_seconds
+```
+
+Measures how long the JVM process has been running, formatted as
+days/hours/min. Watch: a reset to 0 means the app crashed or was restarted;
+investigate if unexpected.
+
+**Heap Used**
+
+```
+sum(jvm_memory_used_bytes{area="heap"})
+```
+
+Measures current heap consumption in bytes. Watch: orange background >256 MB,
+red >512 MB; a value near the red threshold warrants a heap dump or review of
+object retention.
+
+**CPU Usage**
+
+```
+process_cpu_usage * 100
+```
+
+Measures CPU time consumed by the JVM process as a percentage. Watch: orange
+>70 %, red >90 %; sustained high CPU under normal load indicates a hot loop or
+excessive GC.
+
+**GraphQL Request Rate**
+
+```
+rate(http_server_requests_seconds_count{uri="/graphql"}[1m])
+```
+
+Measures requests per second to the `/graphql` endpoint over the last minute.
+Watch: a value of 0 means nothing is hitting the app — confirm the load
+generator or manual traffic is actually reaching it.
 
 ### Row 2 — JVM Memory (time series + gauge)
 
-| Panel | Metric(s) | What it measures | What to watch |
-|---|---|---|---|
-| **Heap Memory** | `jvm_memory_used_bytes{area="heap"}` vs `jvm_memory_max_bytes{area="heap"}` | Heap used and max over time | The used line climbing toward the max line without a sawtooth pattern (GC reclaim) is the signature of a memory leak |
-| **Non-Heap Memory** | `jvm_memory_used_bytes{area="nonheap"}` | Metaspace + JIT code cache | Slow, unbounded growth here points to classloader leaks or excessive dynamic code generation |
-| **Heap Utilization** | `jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} * 100` | Heap used as a percentage of the configured max | Gauge thresholds at 70 % (orange) and 90 % (red); anything above 80 % under sustained load is a risk of `OutOfMemoryError` |
+![Row 2 — JVM Memory](images/grafana-row2-jvm-memory.jpg)
+
+**Heap Memory**
+
+```
+jvm_memory_used_bytes{area="heap"}
+jvm_memory_max_bytes{area="heap"}
+```
+
+Measures heap used and heap max over time (two lines, same panel). Watch: the
+used line climbing toward the max line without a sawtooth pattern (GC reclaim)
+is the signature of a memory leak.
+
+**Non-Heap Memory**
+
+```
+jvm_memory_used_bytes{area="nonheap"}
+```
+
+Measures Metaspace and JIT code cache. Watch: slow, unbounded growth here
+points to classloader leaks or excessive dynamic code generation.
+
+**Heap Utilization**
+
+```
+jvm_memory_used_bytes{area="heap"}
+  / jvm_memory_max_bytes{area="heap"} * 100
+```
+
+Measures heap used as a percentage of the configured max. Watch: gauge
+thresholds at 70 % (orange) and 90 % (red); anything above 80 % under
+sustained load is a risk of `OutOfMemoryError`.
 
 ### Row 3 — GraphQL & HTTP (time series + donut)
 
-| Panel | Metric(s) | What it measures | What to watch |
-|---|---|---|---|
-| **GraphQL Request Rate** | `rate(http_server_requests_seconds_count{uri="/graphql"}[1m])` | Throughput over time | Use this alongside the load generator's reported req/s to confirm the server is receiving what the client is sending; a gap means dropped connections |
-| **Response Time Percentiles** | `histogram_quantile(0.50/0.95/0.99, ...)` on `http_server_requests_seconds_bucket` | p50, p95, p99 latency in seconds | p50 is the typical user experience. p95 and p99 catch tail latency that averages hide. A p99 that is 10× the p50 under load suggests thread contention or GC pauses |
-| **Requests by HTTP Status** | `increase(http_server_requests_seconds_count{...}[$__range])` grouped by `status` | Count of 2xx / 4xx / 5xx over the selected time window | Healthy traffic is almost entirely 2xx. A slice of 4xx indicates client errors (bad input, schema violations). Any 5xx slice is a server-side failure to investigate |
+![Row 3 — GraphQL & HTTP](images/grafana-row3-graphql-http.jpg)
+
+**GraphQL Request Rate**
+
+```
+rate(http_server_requests_seconds_count{uri="/graphql"}[1m])
+```
+
+Measures throughput over time. Watch: compare this to the load generator's
+reported req/s — they should be within 10 % of each other; a larger gap means
+dropped connections.
+
+**Response Time Percentiles**
+
+```
+histogram_quantile(0.50, rate(http_server_requests_seconds_bucket[1m]))
+histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[1m]))
+histogram_quantile(0.99, rate(http_server_requests_seconds_bucket[1m]))
+```
+
+Measures p50, p95, and p99 latency in seconds. Watch: p50 is the typical user
+experience; p95 and p99 catch tail latency that averages hide. A p99 that is
+10× the p50 under load suggests thread contention or GC pauses.
+
+**Requests by HTTP Status**
+
+```
+increase(http_server_requests_seconds_count{...}[$__range])
+  grouped by status
+```
+
+Measures the count of 2xx / 4xx / 5xx responses over the selected time window.
+Watch: healthy traffic is almost entirely 2xx; a 4xx slice indicates client
+errors (bad input, schema violations); any 5xx slice is a server-side failure
+to investigate.
 
 > **Note on SLOs.** The application publishes latency service-level objectives defined in
 > `application.properties` at `1 ms, 5 ms, 10 ms, 25 ms, 50 ms, 100 ms`. These bucket
 > boundaries feed the histogram used by the percentile panels. Treat 100 ms as the informal
 > upper bound for a single GraphQL arithmetic query under normal load.
 
-### Row 4 — JVM Runtime (time series)
+### Row 4 — Incoming Request Logs (logs + bar chart)
 
-| Panel | Metric(s) | What it measures | What to watch |
-|---|---|---|---|
-| **CPU Usage** | `process_cpu_usage` and `system_cpu_usage` | JVM process CPU and total system CPU, both as % over time | If process CPU is high but system CPU is low, the JVM is busy. If both are high the host is saturated. After a change, watch for sustained CPU increase relative to your pre-change baseline |
-| **GC Pause Duration** | `rate(jvm_gc_pause_seconds_sum[1m])` grouped by `action` and `cause` | Time spent in GC pauses per second, broken out by collection type and trigger | Under load, minor GC pauses should be sub-millisecond. Frequent major (full) GC pauses that coincide with latency spikes confirm that memory pressure is the root cause |
-| **JVM Threads** | `jvm_threads_live_threads`, `jvm_threads_daemon_threads`, `jvm_threads_peak_threads` | Active, background, and historical maximum thread counts | This app runs on virtual threads (`spring.threads.virtual.enabled=true`), so live thread count can be high. Watch the **peak** line: if it climbs monotonically it suggests threads are being created but not returned |
+![Row 4 — Incoming Request Logs](images/grafana-row4-incoming-request-logs.jpg)
 
-### Row 5 — Errors (time series + pie)
+**Incoming GraphQL Requests**
 
-| Panel | Metric(s) | What it measures | What to watch |
-|---|---|---|---|
-| **HTTP Error Rate** | `rate(http_server_requests_seconds_count{status=~"4.."})` and `rate(...)status=~"5..")` | 4xx and 5xx request rate per second, orange and red series | A spike that coincides exactly with a deployment or a change in load is a regression signal. Steady-state 4xx from the load generator is expected (input validation). Any 5xx is not |
-| **Error Distribution** | `increase(http_server_requests_seconds_count{status=~"4..\|5.."}[$__range])` | Proportional breakdown of error statuses over the selected window | The donut shows whether errors are concentrated in one status code (e.g. all 400) or spread (400 and 500 both spiking), which narrows the investigation |
+```
+{service="computing_lab_may_2026"} |= "GRAPHQL_REQUEST"
+```
+
+A live Loki log panel streaming every request logged by
+`GraphQLRequestLoggingInterceptor`. Each line shows the thread, remote IP, URI,
+full GraphQL document, and variables. Watch: unexpected operation types or
+malformed documents appear here before they show up in metrics.
+
+**GraphQL Request Volume (per 10m)**
+
+```
+sum by (operation) (
+  count_over_time({service="computing_lab_may_2026"}
+    |= "GRAPHQL_REQUEST"
+    | json
+    [$__interval])
+)
+```
+
+A stacked bar chart breaking request volume down by arithmetic operation (add,
+subtract, multiply, divide) over rolling 10-minute buckets. Watch: all four
+operations should stay within a few percent of each other under the load
+generator; a skewed distribution points to a bug in the operation selection
+logic.
+
+![Row 5 — JVM Runtime](images/grafana-row5-jvm-runtime.jpg)
+
+**CPU Usage**
+
+```
+process_cpu_usage
+system_cpu_usage
+```
+
+Measures JVM process CPU and total system CPU, both as % over time. Watch: if
+process CPU is high but system CPU is low, the JVM is busy; if both are high
+the host is saturated. After a change, watch for sustained CPU increase
+relative to your pre-change baseline.
+
+**GC Pause Duration**
+
+```
+rate(jvm_gc_pause_seconds_sum[1m])   (grouped by action and cause)
+```
+
+Measures time spent in GC pauses per second, broken out by collection type and
+trigger. Watch: under load, minor GC pauses should be sub-millisecond; frequent
+major (full) GC pauses that coincide with latency spikes confirm that memory
+pressure is the root cause.
+
+**JVM Threads**
+
+```
+jvm_threads_live_threads
+jvm_threads_daemon_threads
+jvm_threads_peak_threads
+```
+
+Measures active, background, and historical maximum thread counts. Watch: this
+app runs on virtual threads (`spring.threads.virtual.enabled=true`), so the
+live count can be high; watch the **peak** line — if it climbs monotonically,
+threads are being created but not returned.
+
+### Row 6 — Errors (time series + pie)
+
+![Row 6 — Errors](images/grafana-row6-errors.jpg)
+
+**HTTP Error Rate**
+
+```
+rate(http_server_requests_seconds_count{status=~"4.."}[1m])
+rate(http_server_requests_seconds_count{status=~"5.."}[1m])
+```
+
+Measures 4xx and 5xx request rate per second (orange and red series). Watch: a
+spike coinciding exactly with a deployment or load change is a regression
+signal; steady-state 4xx from the load generator is expected (input
+validation); any 5xx is not.
+
+**Error Distribution**
+
+```
+increase(
+  http_server_requests_seconds_count{status=~"4..|5.."}[$__range]
+)
+```
+
+Measures the proportional breakdown of error statuses over the selected window.
+Watch: the donut shows whether errors are concentrated in one status code (e.g.
+all 400) or spread (400 and 500 both spiking), which narrows the investigation.
 
 ---
 
@@ -160,6 +337,8 @@ No third-party libraries are required; only the standard library is used.
 # 50 threads × 200 requests = 10 000 total. ~15-30 s depending on host speed.
 python3 scripts/graphql-load.py -r 200 -c 50
 ```
+
+![Load generator — run in progress](images/load-generator-running.jpg)
 
 Use this run before starting work on a story to capture your pre-change baseline.
 Take a screenshot of the Grafana Response Time Percentiles and Heap Memory panels
@@ -194,6 +373,8 @@ python3 scripts/graphql-load.py -r 500 -c 40 -e http://staging-host:8080/graphql
 ```
 
 ### Reading the script output
+
+![Load generator — completed run output](images/load-generator-output.jpg)
 
 ```
 ==================================================
@@ -420,13 +601,13 @@ to confirm it is being exported before adding a Grafana panel.
 ## 7. Quick-reference — services and endpoints
 
 | Service | Local URL | Purpose |
-|---|---|---|
-| Application (GraphQL) | `http://localhost:8080/graphql` | The API under test |
-| GraphiQL IDE | `http://localhost:8080/graphiql` | Interactive query explorer (dev profile only) |
-| Prometheus metrics | `http://localhost:8080/actuator/prometheus` | Raw metric export |
-| Prometheus UI | `http://localhost:9090` | Ad-hoc PromQL queries and target status |
-| Grafana | `http://localhost:3000` | Dashboards (no login required) |
-| Loki API | `http://localhost:3100` | Structured log store |
+|:----------------|:--------------------------------------|:-------------------------------|
+| Application (GraphQL) | <http://localhost:8080/graphql> | The API under test |
+| GraphiQL IDE | <http://localhost:8080/graphiql> | Interactive query explorer (dev profile only) |
+| Prometheus metrics | <http://localhost:8080/actuator/prometheus> | Raw metric export |
+| Prometheus UI | <http://localhost:9090> | Ad-hoc PromQL queries and target status |
+| Grafana | <http://localhost:3000> | Dashboards (no login required) |
+| Loki API | <http://localhost:3100> | Structured log store |
 
 All services run inside the devcontainer and are accessible from the host on the
 ports above. They share `dev-network` and communicate using internal hostnames

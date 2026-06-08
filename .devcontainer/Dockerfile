@@ -70,6 +70,13 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
   jq \
   lynx \
   w3m \
+  # --- Document compilation (Markdown → PDF via pandoc + LaTeX) ---
+  pandoc \
+  texlive-latex-base \
+  texlive-latex-recommended \
+  texlive-latex-extra \
+  texlive-fonts-recommended \
+  texlive-xetex \
   && rm -rf /var/lib/apt/lists/*
 
 # Install grpcurl (gRPC command-line client) — arch-aware

@@ -394,6 +394,36 @@ Loki4j 2.x changed the XML configuration format from 1.x. Key differences releva
 
 ---
 
+## Generating PDF Documentation
+
+The Markdown files in this repository can be compiled to PDF using
+[pandoc](https://pandoc.org/) with a XeLaTeX engine. The required toolchain is
+pre-installed in the devcontainer.
+
+```bash
+./scripts/compile-docs.sh
+```
+
+Each `.md` file (except `CLAUDE.md`) is compiled to a `.pdf` alongside its
+source. To collect all PDFs in one directory instead:
+
+```bash
+./scripts/compile-docs.sh --output-dir /tmp/docs-pdf
+```
+
+**Installing the toolchain outside the devcontainer:**
+
+```bash
+# Debian / Ubuntu
+sudo apt-get install pandoc texlive-latex-base texlive-latex-recommended \
+     texlive-latex-extra texlive-fonts-recommended texlive-xetex
+```
+
+> PDF files are excluded from version control via `.gitignore`. Run the script
+> locally whenever you need a rendered copy.
+
+---
+
 ## Running the Project
 
 ### Prerequisites

@@ -18,3 +18,6 @@ out/
 # OS
 .DS_Store
 Thumbs.db
+
+# Generated documentation — compile with ./scripts/compile-docs.sh
+*.pdf
