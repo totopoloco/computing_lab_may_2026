@@ -105,7 +105,12 @@
       "Bash(mv \"Screenshot 2026-06-08 115526.jpg\" grafana-row3-graphql-http.jpg)",
       "Bash(mv \"Screenshot 2026-06-08 115616.jpg\" grafana-row4-incoming-request-logs.jpg)",
       "Bash(rm -f /workspace/docs/OBSERVABILITY.pdf)",
-      "Bash(pandoc OBSERVABILITY.md --pdf-engine=xelatex --variable geometry:margin=2.5cm --variable fontsize=11pt --variable colorlinks=true --variable 'mainfont=DejaVu Serif' --variable 'monofont=DejaVu Sans Mono' -o OBSERVABILITY.pdf)"
+      "Bash(pandoc OBSERVABILITY.md --pdf-engine=xelatex --variable geometry:margin=2.5cm --variable fontsize=11pt --variable colorlinks=true --variable 'mainfont=DejaVu Serif' --variable 'monofont=DejaVu Sans Mono' -o OBSERVABILITY.pdf)",
+      "Bash(chmod +x /workspace/toggle-calculator.sh)",
+      "Bash(./toggle-calculator.sh status *)",
+      "Bash(./toggle-calculator.sh good *)",
+      "Bash(./toggle-calculator.sh toggle *)",
+      "Bash(./toggle-calculator.sh bad *)"
     ]
   }
 }
