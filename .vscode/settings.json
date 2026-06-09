@@ -152,5 +152,21 @@
   "java.dependency.packagePresentation": "hierarchical",
   "codescene.enableTelemetry": false,
   "editor.inlineSuggest.enabled": true,
-  "chat.disableAIFeatures": false
+  "chat.disableAIFeatures": false,
+  // IDE Border Color Customizations
+  "workbench.colorCustomizations": {
+    "activityBar.border": "#dede62",
+    "panel.border": "#dede62",
+    "statusBar.border": "#dede62",
+    "titleBar.border": "#dede62",
+    "sash.hoverBorder": "#dede62",
+    "editorGroupHeader.border": "#dede62",
+    "tab.border": "#dede62",
+    "tab.activeBorder": "#dede62",
+    "commandCenter.border": "#dede62",
+    "menubar.selectionBorder": "#dede62",
+    "notifications.border": "#dede62",
+    "notificationToast.border": "#dede62",
+    "widget.border": "#dede62"
+  }
 }
