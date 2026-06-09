@@ -30,7 +30,7 @@ application/
   arithmetic/    # CalculatorService — delegates to domain, no business logic
 infrastructure/
   config/        # GraphQLConfig — registers custom scalars (BigDecimal via graphql-java-extended-scalars)
-  web/graphql/   # ArithmeticController (@QueryMapping), GraphQLExceptionHandler
+  web/graphql/   # ArithmeticController (@QueryMapping), GraphQLExceptionHandler, GraphQlRequestLoggingInterceptor
 ```
 
 **The only API is GraphQL** (`/graphql`). There are no REST controllers. The schema lives at `src/main/resources/graphql/schema.graphqls`. The GraphiQL IDE is enabled in dev at `/graphiql`. `BigDecimal` is a custom scalar registered in `GraphQLConfig`; add new scalars there.
@@ -79,6 +79,7 @@ When adding a new feature the full touch list is:
 - Domain tests: `@SpringBootTest` (full context, no mocks), `@Nested` inner classes, AssertJ assertions, exhaustive coverage of happy paths, edge cases, and constraint violations.
 - Application tests: `@SpringBootTest` (full context, no mocks), `@Nested` inner classes, AssertJ assertions — same setup as domain tests.
 - GraphQL integration tests: `@SpringBootTest @AutoConfigureGraphQlTester` with an injected `GraphQlTester`; use raw GraphQL query documents, covering happy-path and error responses. Import `@AutoConfigureGraphQlTester` from `org.springframework.boot.graphql.test.autoconfigure.tester` (Spring Boot 4.x path — the old `org.springframework.graphql.test.tester` package no longer applies).
+- `WebGraphQlInterceptor` tests must use `@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)` with a `RestClient` and `@ExtendWith(OutputCaptureExtension.class)` for log assertions. `GraphQlTester` without a real HTTP server bypasses the interceptor chain entirely. See `GraphQlRequestLoggingInterceptorTest` for the pattern.
 - **BigDecimal assertions** — always use `isEqualByComparingTo(new BigDecimal("..."))`, never `isEqualTo()`. `BigDecimal.equals` is scale-sensitive: `new BigDecimal("3.0").equals(new BigDecimal("3.00"))` is `false`, so `isEqualTo` produces false negatives.
 - Mutation testing: every new domain class must maintain the project-wide ≥ 79% mutation and line coverage threshold (`./gradlew pitest`). Tests must kill mutations — avoid trivial assertions that survive mutants.
 - `CalculatorWeakTest` is an intentional educational artifact that demonstrates how imprecise assertions allow mutation survivors (e.g., `NULL_RETURNS`, `NEGATE_CONDITIONALS`). Do not strengthen it.
@@ -86,7 +87,7 @@ When adding a new feature the full touch list is:
 ## Key configuration
 
 - Active profile: `dev` (H2 in-memory DB, GraphiQL at `/graphiql`, H2 console at `/h2-console`, `logging.pattern.console=%msg%n` for clean output)
-- Logging & observability: see [LOGGING.md](LOGGING.md) — covers the Console/Loki sink split, the `additivity="false"` routing rule, and how to add new Loki-only loggers (e.g. `ExceptionLoggingInterceptor`)
+- Logging & observability: see [LOGGING.md](LOGGING.md) — covers the Console/Loki sink split, the `additivity="false"` routing rule, and how to add new Loki-only loggers. `GraphQlRequestLoggingInterceptor` is the existing example: it is suppressed in `dev` (`logging.level...=OFF` in `application-dev.properties`) and re-enabled only when the `loki` profile is active. To run with both: `spring.profiles.active=dev,loki`.
 - Java 25 toolchain, Spring Boot 4.x
 - Pitest mutation threshold: 79%; targets `domain.*` classes only
 - JaCoCo line/branch coverage runs automatically after `./gradlew test`; report: `build/reports/jacoco/test/html/index.html`; scoped to `domain.*` + `application.*`
